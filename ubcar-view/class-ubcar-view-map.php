@@ -54,7 +54,7 @@
 			add_action( 'wp_ajax_ubcar_wiki_page', array( $this, 'ubcar_get_wiki_page' ) );
 			add_action( 'wp_ajax_ubcar_submit_comment', array( $this, 'ubcar_submit_comment' ) );
 			add_action( 'wp_ajax_ubcar_submit_reply', array( $this, 'ubcar_submit_reply' ) );
-			add_action( 'wp', array( $this, 'ubcar_media_data_handler' ) );
+			add_action( 'parse_request', array( $this, 'ubcar_media_data_handler' ) );
 		}
 
 		/**
@@ -164,9 +164,9 @@
 					<div id="ubcar-streetview-canvas">
 					</div>
 					<div class="ubcar-display-choice">
-						<div class="ubcar-accordion-header ubcar-half" id="ubcar-display-choice-map">Map View</div>
+						<div class="ubcar-accordion-header ubcar-half" id="ubcar-display-choice-map">Map</div>
 						<div class="ubcar-half-buffer"></div>
-						<div class="ubcar-accordion-header ubcar-half" id="ubcar-display-choice-street">Street View</div>
+						<div class="ubcar-accordion-header ubcar-half" id="ubcar-display-choice-street">Street</div>
 						<div class="ubcar-half-buffer"></div>
 						<div class="ubcar-accordion-header ubcar-half" id="ubcar-display-fullscreen">Fullscreen</div>
 					</div>
@@ -251,7 +251,7 @@
 			echo ' id="ubcar-comment-';
 			comment_ID();
 			echo '">';
-			echo  '<div class="ubcar-comment-header">' . $user->first_name . " " . $user->last_name . " ( " . $comment->comment_author . " ) - " . get_comment_date() . " " .  get_comment_time() . '</div>';
+			echo  '<div class="ubcar-comment-header">' . $user->first_name . " " . $user->last_name . " (" . $comment->comment_author . ") - " . get_comment_date() . " " .  get_comment_time() . '</div>';
 			if( is_user_logged_in() ) {
 				echo '<div class="ubcar-comment-header ubcar-comment-reply" id="ubcar-comment-reply-' . get_comment_ID() . '"> - <a>Reply</a></div>';
 			}
@@ -727,7 +727,7 @@
 			} else {
 				$tempArray["url"] = $ubcar_media_meta['url'];
 			}
-			$tempArray["uploader"] = $ubcar_media_author->first_name . ' ' . $ubcar_media_author->last_name . ' ( ' . $ubcar_media_author->user_login . ' )';
+			$tempArray["uploader"] = $ubcar_media_author->first_name . ' ' . $ubcar_media_author->last_name . ' (' . $ubcar_media_author->user_login . ')';
 			$tempArray["title"] = $ubcar_media->post_title;
 			$tempArray["date"] = date( 'F j, Y', strtotime( get_the_date( 'Y-m-d', $ubcar_media->ID ) ) );
 			$tempArray["description"] = $ubcar_media->post_content;
