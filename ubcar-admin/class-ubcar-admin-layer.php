@@ -170,7 +170,7 @@ class UBCAR_Admin_Layer extends UBCAR_Admin {
 			$ubcar_layer_author = get_user_by( 'id', $ubcar_layer->post_author );
 			$tempArray = array();
 			$tempArray["ID"] = $ubcar_layer->ID;
-			$tempArray["uploader"] = $ubcar_layer_author->first_name . ' ' . $ubcar_layer_author->last_name . ' ( ' . $ubcar_layer_author->user_login . ' )';
+			$tempArray["uploader"] = $ubcar_layer_author->first_name . ' ' . $ubcar_layer_author->last_name . ' (' . $ubcar_layer_author->user_login . ')';
 			$tempArray["title"] = $ubcar_layer->post_title;
 			$tempArray["date"] = get_the_date( 'Y-m-d', $ubcar_layer->ID );
 			$tempArray["description"] = $ubcar_layer->post_content;

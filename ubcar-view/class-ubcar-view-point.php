@@ -253,7 +253,15 @@
             ?>
 
           </div>
-          <div id="ubcar-header-loginout"><?php wp_loginout($_SERVER['REQUEST_URI'], true); ?></div>
+          <div id="ubcar-header-loginout">
+              <?php wp_loginout($_SERVER['REQUEST_URI'], true);
+              if ( is_user_logged_in() ) {
+
+              } else {
+
+              }
+              ?>
+          </div>
 
 				</div>
 			</div>
@@ -402,7 +410,7 @@
 			echo ' id="ubcar-comment-';
 			comment_ID();
 			echo '">';
-			echo  '<div class="ubcar-comment-header">' . $user->first_name . " " . $user->last_name . " ( " . $comment->comment_author . " ) - " . get_comment_date() . " " .  get_comment_time() . '</div>';
+			echo  '<div class="ubcar-comment-header">' . $user->first_name . " " . $user->last_name . " (" . $comment->comment_author . ") - " . get_comment_date() . " " .  get_comment_time() . '</div>';
 			if( is_user_logged_in() ) {
 				echo '<div class="ubcar-comment-header ubcar-comment-reply" id="ubcar-comment-reply-' . get_comment_ID() . '"> - <a>Reply</a></div>';
 			}
@@ -741,7 +749,7 @@
 			} else {
 				$tempArray["url"] = $ubcar_media_meta['url'];
 			}
-			$tempArray["uploader"] = $ubcar_media_author->first_name . ' ' . $ubcar_media_author->last_name . ' ( ' . $ubcar_media_author->user_login . ' )';
+			$tempArray["uploader"] = $ubcar_media_author->first_name . ' ' . $ubcar_media_author->last_name . ' (' . $ubcar_media_author->user_login . ')';
 			$tempArray["title"] = $ubcar_media->post_title;
 			$tempArray["date"] = date( 'F j, Y', strtotime( get_the_date( 'Y-m-d', $ubcar_media->ID ) ) );
 			$tempArray["description"] = $ubcar_media->post_content;

@@ -2,31 +2,31 @@
 
 	/**
 	 * The UBCAR_Admin superclass
-	 * 
+	 *
 	 * This file defines the UBCAR_Admin superclass and requires its subclasses,
 	 * allowing users to administer the UBCAR backend.
-	 * 
+	 *
 	 * It is also directly responsible for managing some UBCAR options. There
 	 * are four UBCAR options:
-	 * 
+	 *
 	 * - ubcar_css_choice: choice of CSS, two-column or pseudo-full-screen
 	 *	 ( see class-ubcar-view-map.php )
 	 * - ubcar_google_maps_api_key: Google Maps API key for Maps dispay
 	 * - ubcar_app_title: display title for an UBCAR-associated app
 	 * - ubcar_app_introduction: introductory text for an UBCAR-associated app
-	 * 
+	 *
 	 * It also defines four types of WordPress posts:
-	 * 
+	 *
 	 * - ubcar_layer
 	 * - ubcar_point
 	 * - ubcar_medium
 	 * - ubcar_tour
-	 * 
+	 *
 	 * Each of these types is controlled by its own UBCAR_Admin subclass. These
 	 * types interact in the UBCAR_View and UBCAR_Data classes.
-	 * 
+	 *
 	 * UBCAR_Admin depends on jQuery and ( optionally ) Google Maps.
-	 * 
+	 *
 	 * @package UBCAR
 	 */
 
@@ -37,20 +37,20 @@
 	require_once( plugin_dir_path( __FILE__ ).'class-ubcar-admin-point.php' );
 	require_once( plugin_dir_path( __FILE__ ).'class-ubcar-admin-tour.php' );
 	require_once( plugin_dir_path( __FILE__ ).'class-ubcar-admin-medium.php' );
-	
+
 	/**
 	 * The UBCAR_Admin superclass.
 	 */
 	class UBCAR_Admin {
-	
+
 		var $ubcar_admin_layers;
 		var $ubcar_admin_media;
 		var $ubcar_admin_points;
 		var $ubcar_admin_tours;
-	
+
 		/**
 		 * The UBCAR_Admin constructor.
-		 * 
+		 *
 		 * @access public
 		 * @return void
 		 */
@@ -61,11 +61,11 @@
 			$this->ubcar_admin_tours = new UBCAR_Admin_Tour();
 			$this->add_actions();
 		}
-		
+
 		/**
 		 * This function adds the UBCAR_Admin actions, including its AJAX
 		 * callback hook.
-		 * 
+		 *
 		 * @access public
 		 * @return void
 		 */
@@ -75,12 +75,12 @@
 			add_action( 'init', array( $this, 'register_post_types' ) );
 			add_action( 'wp_ajax_options_updater', array( $this, 'ubcar_options_updater_callback' ) );
 		}
-		
+
 		/**
-		 * 
+		 *
 		 * This function registers a UI script and registers and enqueues the
 		 * Dashboard style.
-		 * 
+		 *
 		 * @access public
 		 * @return void
 		 */
@@ -89,10 +89,10 @@
 			wp_register_style( 'ubcar_control_panel_style', plugins_url( '/css/ubcar-admin-style.css', dirname( __FILE__ ) ) );
 			wp_enqueue_style( 'ubcar_control_panel_style' );
 		}
-		
+
 		/**
 		 * This function registers the new UBCAR post types.
-		 * 
+		 *
 		 * @access public
 		 * @return void
 		 */
@@ -102,11 +102,11 @@
 			register_post_type( 'ubcar_tour' );
 			register_post_type( 'ubcar_point' );
 		}
-		
+
 		/**
 		 * This function creates the UBCAR menu pages and helps determine who
 		 * can access them.
-		 * 
+		 *
 		 * @access public
 		 * @return void
 		 */
@@ -121,10 +121,10 @@
 				add_submenu_page( 'ubcar', 'UBCAR Tours', 'Tours', 'edit_pages', 'ubcar-tours', array( $this->ubcar_admin_tours, 'menu_initializer' ) );
 			}
 		}
-		
+
 		/**
 		 * This function initializes the main UBCAR menu page.
-		 * 
+		 *
 		 * @access public
 		 * @return void
 		 */
@@ -189,11 +189,11 @@
 				<div class="button button-primary" id="ubcar-options-submit">Submit</div>
 			<?php
 		}
-	
+
 		/**
 		 * This is the callback function for ubcar-options-updater.js's AJAX
 		 * requests, updating the UBCAR options.
-		 * 
+		 *
 		 * @access public
 		 * @return void
 		 */
@@ -211,5 +211,5 @@
 		}
 
 	}
-	
+
 ?>

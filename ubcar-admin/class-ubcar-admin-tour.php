@@ -1,14 +1,14 @@
 <?php
 	/**
 	 * The UBCAR_Admin_Tour subclass
-	 * 
+	 *
 	 * This file defines the UBCAR_Admin_Tour subclass. The UBCAR_Admin_Tour
-	 * class manages ubcar_tour-type posts. ubcar_tour-type posts have one extra 
+	 * class manages ubcar_tour-type posts. ubcar_tour-type posts have one extra
 	 * piece of metadata:
-	 * 
+	 *
 	 * - ubcar_tour_locations: an array of ubcar_point-type post IDs associated
 	 *	 with this tour. Their order determines the order of the tour.
-	 * 
+	 *
 	 * @package UBCAR
 	 */
 
@@ -16,21 +16,21 @@
 	 * The UBCAR_Admin_Tour subclass
 	 */
 	class UBCAR_Admin_Tour extends UBCAR_Admin {
-	
+
 		/**
 		 * The UBCAR_Admin_Tour constructor.
-		 * 
+		 *
 		 * @access public
 		 * @return void
 		 */
 		public function __construct() {
 			$this->add_actions();
 		}
-		
+
 		/**
 		 * This function adds the UBCAR_Admin_Tour actions, including its AJAX
 		 * callback hooks.
-		 * 
+		 *
 		 * @access public
 		 * @return void
 		 */
@@ -43,10 +43,10 @@
 			add_action( 'wp_ajax_tour_edit', array( $this, 'ubcar_tour_edit' ) );
 			add_action( 'wp_ajax_tour_edit_submit', array( $this, 'ubcar_tour_edit_submit' ) );
 		}
-		
+
 		/**
 		 * This function initializes the main UBCAR Tour menu page.
-		 * 
+		 *
 		 * @access public
 		 * @return void
 		 */
@@ -118,11 +118,11 @@
 			</div>
 			<?php
 		}
-		
+
 		/**
 		 * This is the callback function for ubcar-tour-updater.js's
 		 * update_tours() AJAX request, adding a new tour post.
-		 * 
+		 *
 		 * @access public
 		 * @global object $wpdb
 		 * @return void
@@ -132,13 +132,13 @@
 			if ( !isset( $_POST['ubcar_nonce_field'] ) || !wp_verify_nonce( $_POST['ubcar_nonce_field'],'ubcar_nonce_check' ) ) {
 				echo 'Sorry, WordPress has rejected your submission - specifically, your nonce did not verify. Please reload the form page and try again. This message may occur if you took more than a day to complete your form, if you do not have the appropriate privileges to submit data points but nonetheless try, or if the ubcar coding team made an error.';
 			} else {
-				$ubcar_tour_post = array( 
+				$ubcar_tour_post = array(
 					'post_title' => sanitize_text_field( $_POST['ubcar_tour_title'] ),
 					'post_content' => sanitize_text_field( $_POST['ubcar_tour_description'] ),
 					'post_status' => 'publish',
 					'post_type' => 'ubcar_tour'
 				);
-				
+
 				$ubcar_tour_id = wp_insert_post( $ubcar_tour_post );
 				if( isset( $_POST['ubcar_tour_locations'] ) ) {
 					$ubcar_tour_locations = array_map( 'esc_attr', $_POST['ubcar_tour_locations']);
@@ -146,16 +146,16 @@
 				}
 				echo 'Submission uploaded!';
 			}
-			
+
 			die();
 		}
-	
+
 		/**
 		 * This is the helper function for retrieving a set of ubcar_tour data
 		 * from the database, converting it to JSON, and echoing it.
-		 * 
+		 *
 		 * @param int $ubcar_tour_offset
-		 * 
+		 *
 		 * @access public
 		 * @global object $wpdb
 		 * @return void
@@ -170,13 +170,13 @@
 			}
 			wp_send_json( $response );
 		}
-		
+
 		/**
 		 * This is a helper function for retrieving a single ubcar_tour datum
 		 * and metadata from the database.
-		 * 
+		 *
 		 * @param int $tour_ubcar_id
-		 * 
+		 *
 		 * @access public
 		 * @return array
 		 */
@@ -186,7 +186,7 @@
 			$ubcar_tour_author = get_user_by( 'id', $ubcar_tour->post_author );
 			$temp_array = array();
 			$temp_array["ID"] = $ubcar_tour->ID;
-			$temp_array["uploader"] = $ubcar_tour_author->first_name . ' ' . $ubcar_tour_author->last_name . ' ( ' . $ubcar_tour_author->user_login . ' )';
+			$temp_array["uploader"] = $ubcar_tour_author->first_name . ' ' . $ubcar_tour_author->last_name . ' (' . $ubcar_tour_author->user_login . ')';
 			$temp_array["title"] = $ubcar_tour->post_title;
 			$temp_array["date"] = get_the_date( 'Y-m-d', $ubcar_tour->ID );
 			$temp_array["description"] = $ubcar_tour->post_content;
@@ -205,35 +205,35 @@
 			$temp_array["locations"] = $ubcar_tour_meta_names;
 			return $temp_array;
 		}
-		
+
 		/**
 		 * This is the callback function for ubcar-tour-updater.js's
 		 * initial AJAX request, displaying a set of ubcar_tour posts.
-		 * 
+		 *
 		 * @access public
 		 * @return void
 		 */
 		function ubcar_tour_initial() {
 			$this->ubcar_tour_get_tours( 0 );
 		}
-		
+
 		/**
 		 * This is the callback function for ubcar-point-updater.js's
 		 * forward_tours() AJAX request, displaying the next set of
 		 * ubcar_tour posts.
-		 * 
+		 *
 		 * @access public
 		 * @return void
 		 */
 		function ubcar_tour_forward() {
 			$this->ubcar_tour_get_tours( intval( $_POST['ubcar_tour_offset'] ) * 10 );
 		}
-		
+
 		/**
 		 * This is the callback function for ubcar-tour-updater.js's
 		 * backward_tours() AJAX request, displaying the previous set of
 		 * ubcar_tour posts.
-		 * 
+		 *
 		 * @access public
 		 * @return void
 		 */
@@ -244,11 +244,11 @@
 			}
 			$this->ubcar_tour_get_tours( $back_tour );
 		}
-		
+
 		/**
 		 * This is the callback function for ubcar-tour-updater.js's
 		 * delete_tours() AJAX request, deleting an ubcar_tour post
-		 * 
+		 *
 		 * @access public
 		 * @global object $wpdb
 		 * @return void
@@ -267,11 +267,11 @@
 				}
 			}
 		}
-		
+
 		/**
 		 * This is the callback function for ubcar-tour-updater.js's
 		 * edit_tours() AJAX request, retrieving a single tour.
-		 * 
+		 *
 		 * @access public
 		 * @global object $wpdb
 		 * @return void
@@ -299,11 +299,11 @@
 				}
 			}
 		}
-		
+
 		/**
 		 * This is the callback function for ubcar-tour-updater.js's
 		 * edit_tours_submit() AJAX request, updating the ubcar_tour post.
-		 * 
+		 *
 		 * @access public
 		 * @global object $wpdb
 		 * @return void
@@ -317,7 +317,7 @@
 				if( get_current_user_id() != $edit_post->post_author && !current_user_can( 'edit_pages' ) ) {
 					echo 0;
 				} else {
-					$update_array = array( 
+					$update_array = array(
 						'ID' => sanitize_text_field( $_POST['ubcar_tour_edit_id'] ),
 						'post_title' => sanitize_text_field( $_POST['ubcar_tour_title'] ),
 						'post_content' => sanitize_text_field( $_POST['ubcar_tour_description'] )
@@ -333,5 +333,5 @@
 		}
 
 	}
-	
+
 ?>
