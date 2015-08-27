@@ -1,0 +1,22 @@
+{
+	"name": 		"ubc/ubcar",
+	"description": 	"UBCAR is a community-driven, wiki-inspired, deeply interactive WordPress plugin. It allows WordPress administrators and editors to upload and display geographic locations and associate them with tours, layers, and media files (like images, video links, and embedded webpages).",
+	"keywords": 	[ "wordpress", "plugin" ],
+	"homepage": 	"https://github.com/nathansidles/ubcar",
+	"license": 		"GPLv2",
+
+	"authors": [
+		{
+			"name": 	"Nathan Sidles",
+			"email": 	"nathan.sidles@ubc.ca",
+			"homepage": "https://github.com/nathansidles/ubcar"
+		}
+	],
+
+	"type": "wordpress-plugin",
+
+	"require": {
+		"php": ">=5.3",
+		"composer/installers": "~1.0"
+	}
+}
