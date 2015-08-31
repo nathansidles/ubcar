@@ -254,7 +254,7 @@
 
           </div>
           <div id="ubcar-header-loginout">
-              <?php wp_loginout($_SERVER['REQUEST_URI'], true);
+              <?php echo wp_loginout('http'.(empty($_SERVER['HTTPS'])?'':'s').'://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'], true);
               if ( is_user_logged_in() ) {
 
               } else {
@@ -306,9 +306,9 @@
 				if ( !isset( $_POST['ubcar-nonce-field'] ) || !wp_verify_nonce( $_POST['ubcar-nonce-field'],'ubcar_nonce_check' ) ) {
 					die();
 				} else {
-          require_once( ABSPATH . 'wp-admin/includes/image.php' );
-	require_once( ABSPATH . 'wp-admin/includes/file.php' );
-	require_once( ABSPATH . 'wp-admin/includes/media.php' );
+                    require_once( ABSPATH . 'wp-admin/includes/image.php' );
+	                require_once( ABSPATH . 'wp-admin/includes/file.php' );
+	                require_once( ABSPATH . 'wp-admin/includes/media.php' );
 					$ubcar_url = "";
 					$ubcar_media_post_meta = array();
 					$ubcar_media_post = array(
@@ -384,7 +384,7 @@
 					update_post_meta( $this->ubcar_media_data_cleaner( $_POST['ubcar-hidden-request-location'] ), 'ubcar_point_media', $ubcar_location_media );
 
 				}
-				$return_url = plugins_url( 'ubcar-data/ubcar-post-redirect-get.php', dirname( __FILE__ ) ) . '?return=' . $_SERVER['REQUEST_URI'] . '&point=' . $_POST['ubcar-hidden-request-location'];
+				$return_url = plugins_url( 'ubcar-data/ubcar-post-redirect-get.php', dirname( __FILE__ ) ) . '?return=' . 'http'.(empty($_SERVER['HTTPS'])?'':'s').'://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'] . '&view_point=' . $_POST['ubcar-hidden-request-location'];
 				wp_redirect( $return_url );
 				exit;
 			}

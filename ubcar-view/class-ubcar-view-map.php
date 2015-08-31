@@ -749,7 +749,7 @@
 
 		function ubcar_media_data_handler() {
 				global $wpdb;
-				if( isset( $_POST['ubcar-nonce-field'] ) && isset( $_POST['ubcar-media-type'] ) ) {
+				if( isset( $_POST['ubcar-nonce-field'] ) && isset( $_POST['ubcar-media-type'] ) && !isset( $_GET['ubcar_point_view'] ) ) {
 					if ( !isset( $_POST['ubcar-nonce-field'] ) || !wp_verify_nonce( $_POST['ubcar-nonce-field'],'ubcar_nonce_check' ) ) {
 						die();
 					} else {
@@ -832,7 +832,7 @@
 
 					}
 					$return_pathway = explode( '?' , $_SERVER['REQUEST_URI'] );
-					$return_url = plugins_url( 'ubcar-data/ubcar-post-redirect-get.php', dirname( __FILE__ ) ) . '?return=' . $return_pathway[0] . '&point_map=' . $_POST['ubcar-hidden-request-location'];
+					$return_url = plugins_url( 'ubcar-data/ubcar-post-redirect-get.php', dirname( __FILE__ ) ) . '?return=' . 'http'.(empty($_SERVER['HTTPS'])?'':'s').'://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'] . '&map_point=' . $_POST['ubcar-hidden-request-location'];
 					wp_redirect( $return_url );
 					exit;
 				}
