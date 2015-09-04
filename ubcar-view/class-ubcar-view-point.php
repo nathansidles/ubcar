@@ -55,9 +55,9 @@
 		}
 
         function parse_request( $wp ) {
-            if( isset( $_GET['ubcar_point_view'] ) && isset( $_GET['point'] ) ) {
+            if( isset( $_GET['ubcar_point_view'] ) ) {
               $this->ubcar_media_data_handler();
-                if( get_post_type( $_GET['point'] ) == 'ubcar_point' ) {
+                if( get_post_type( $_GET['ubcar_point_view'] ) == 'ubcar_point' ) {
                     $this->ubcar_make_map();
                 }
             }
@@ -236,7 +236,7 @@
                 </tr>
                 <tr>
                   <th scope="row">
-                    <?php echo '<input type="hidden" value="' . $_GET['point'] . '" id="ubcar-hidden-request-location" name="ubcar-hidden-request-location">'; ?>
+                    <?php echo '<input type="hidden" value="' . $_GET['ubcar_point_view'] . '" id="ubcar-hidden-request-location" name="ubcar-hidden-request-location">'; ?>
                     <input class="button button-primary" name="ubcar-media-submit" id="ubcar-media-submit" type="submit" value="Upload">
                   </th>
                 </tr>
@@ -254,12 +254,9 @@
 
           </div>
           <div id="ubcar-header-loginout">
-              <?php echo wp_loginout('http'.(empty($_SERVER['HTTPS'])?'':'s').'://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'], true);
-              if ( is_user_logged_in() ) {
+              <?php
+              echo wp_loginout( 'http' . (empty($_SERVER['HTTPS']) ? '' : 's' ) . '://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'] . '&point=' . $_GET['ubcar_point_view'], true);
 
-              } else {
-
-              }
               ?>
           </div>
 
@@ -267,12 +264,12 @@
 			</div>
 		<?php
 			// determine if a GET request is being made and populate extra fields for JavaScript detection
-			if( ( isset( $_GET['point'] ) && is_numeric( $_GET['point'] ) ) || ( isset( $_GET['layer'] ) && is_numeric( $_GET['layer'] ) ) || ( isset( $_GET['tour'] ) && is_numeric( $_GET['tour'] ) ) ) {
+			if( ( isset( $_GET['ubcar_point_view'] ) && is_numeric( $_GET['ubcar_point_view'] ) ) || ( isset( $_GET['layer'] ) && is_numeric( $_GET['layer'] ) ) || ( isset( $_GET['tour'] ) && is_numeric( $_GET['tour'] ) ) ) {
 				$request_type = "";
 				$request_value = "";
-				if( isset( $_GET['point'] ) ) {
+				if( isset( $_GET['ubcar_point_view'] ) ) {
 					$request_type = 'ubcar_point';
-					$request_value = $_GET['point'];
+					$request_value = $_GET['ubcar_point_view'];
 					$request_post_meta = get_post_meta( $request_value );
 					if( isset( $request_post_meta ) && isset( $request_post_meta["ubcar_point_latitude"] ) ) {
 						$request_latitude = number_format( ( float )$request_post_meta["ubcar_point_latitude"][0], 7, '.', '' );
@@ -292,7 +289,7 @@
 				if( $ubcar_post_type == $request_type ) {
 					echo '<input type="hidden" value="' . $request_type . '" id="ubcar-hidden-request-type">';
 					echo '<input type="hidden" value="' . $request_value . '" id="ubcar-hidden-request-value">';
-					if( isset( $_GET['point'] ) ) {
+					if( isset( $_GET['ubcar_point_view'] ) ) {
 						echo '<input type="hidden" value="' . $request_latitude . '" id="ubcar-hidden-request-latitude">';
 						echo '<input type="hidden" value="' . $request_longitude . '" id="ubcar-hidden-request-longitude">';
 					}

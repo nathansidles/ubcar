@@ -10,7 +10,7 @@
 	if( isset( $_GET['return'] ) && $_GET['return'] != '' ) {
 		$return_url = $_GET['return'];
 		if( isset( $_GET['view_point'] ) ) {
-			$return_url .= '&point='. $_GET['view_point'];
+			$return_url .= '&ubcar_point_view='. $_GET['view_point'];
 		}
 		if( isset( $_GET['map_point'] ) ) {
 			$return_url = explode( '?', $return_url );
