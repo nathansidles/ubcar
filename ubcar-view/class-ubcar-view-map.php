@@ -180,14 +180,21 @@
 						<div class="ubcar-header" id="ubcar-header-aggregate">Layer/Tour<br />Information</div>
 						<div class="ubcar-body" id="ubcar-body-aggregate"></div>
 					</div>
-					<div id="ubcar-point-information">
-						<div class="ubcar-header" id="ubcar-header-information">Point<br />Information</div>
-						<div class="ubcar-body" id="ubcar-body-information"></div>
-					</div>
-					<div id="ubcar-point-media">
-						<div class="ubcar-header" id="ubcar-header-media">Point<br />Media</div>
-						<div class="ubcar-body" id="ubcar-body-media"></div>
-					</div>
+					<?php if( get_option( 'ubcar_display_choice' ) == 'separate' ) { ?>
+						<div id="ubcar-point-information">
+							<div class="ubcar-header" id="ubcar-header-information">Point<br />Information</div>
+							<div class="ubcar-body" id="ubcar-body-information"></div>
+						</div>
+						<div id="ubcar-point-media">
+							<div class="ubcar-header" id="ubcar-header-media">Point<br />Media</div>
+							<div class="ubcar-body" id="ubcar-body-media"></div>
+						</div>
+					<?php } else { ?>
+						<div id="ubcar-point-information">
+							<div class="ubcar-header" id="ubcar-header-information">Point<br />Content</div>
+							<div class="ubcar-body" id="ubcar-body-information"></div>
+						</div>
+					<?php } ?>
 					<div class="ubcar-header" id="ubcar-header-comments">Point<br />Comments</div>
 					<div class="ubcar-body" id="ubcar-body-comments"></div>
 					<div class="ubcar-header" id="ubcar-header-comments-submit">Submit New Comment</div>

@@ -6,7 +6,7 @@
  *
  * Description: UBCAR allows users to upload locations, tours, media, and layers. These can be displayed geographically with the [ubcar-map] shortcode. Any logged-in user is allowed to upload media and comment on existing points. The UBCAR API can also retrieve the plugin's data.
  *
- * Version: 0.9.8
+ * Version: 1.0.0
  * Author: Nathan Sidles, Eduardo Jovel
  * Author URI: http://sidl.es/
  * LICENSE: GPL2

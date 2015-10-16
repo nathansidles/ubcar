@@ -72,6 +72,7 @@
 			add_action( 'wp_ajax_media_forward', array( $this, 'ubcar_media_forward' ) );
 			add_action( 'wp_ajax_media_backward', array( $this, 'ubcar_media_backward' ) );
 			add_action( 'wp_ajax_media_delete', array( $this, 'ubcar_media_delete' ) );
+			add_action( 'wp_ajax_media_goto', array( $this, 'ubcar_media_goto' ) );
 			add_action( 'wp_ajax_media_edit', array( $this, 'ubcar_media_edit' ) );
 			add_action( 'wp_ajax_media_edit_submit', array( $this, 'ubcar_media_edit_submit' ) );
 			add_action( 'admin_init', array( $this, 'ubcar_media_data_handler' ) );
@@ -242,9 +243,13 @@
 			</div>
 			<table class="ubcar-table" id="ubcar-media-table">
 			</table>
+			<div class="ubcar-goto">
+				<input type="text" id="ubcar-media-choose-count" style="width:40px;">
+				<input type="submit" id="ubcar-media-goto" value="Go to Page">
+			</div>
 			<div class="ubcar-forward-back">
 				<a class="ubcar-forward-back-control" id="ubcar-media-back">Prev</a>
-				<span id="ubcar-media-display-count">1</span>
+				<span id="ubcar-media-display-count">1</span> of <span id="ubcar-media-max-count"><?php echo max( ( ceil( wp_count_posts('ubcar_media')->publish / 25 ) ), 1 ); ?></span>
 				<a class="ubcar-forward-back-control" id="ubcar-media-forward">Next</a>
 			</div>
 			<?php
@@ -364,7 +369,7 @@
 		 */
 		function ubcar_media_get_medias( $ubcar_media_offset, $ubcar_author_name ) {
 			global $wpdb;
-			$ubcar_get_medias_parameters = array( 'posts_per_page' => 10, 'offset' => $ubcar_media_offset, 'order' => 'DESC', 'post_type' => 'ubcar_media' );
+			$ubcar_get_medias_parameters = array( 'posts_per_page' => 25, 'offset' => $ubcar_media_offset, 'order' => 'DESC', 'post_type' => 'ubcar_media' );
 			if( $ubcar_author_name != '' ) {
 				$ubcar_get_medias_parameters['author_name'] = $ubcar_author_name;
 			}
@@ -421,7 +426,7 @@
 				$tempArray["url"] = $ubcar_media_meta['url'];
 				$tempArray["type"] = $ubcar_media_meta['type'];
 			}
-			$tempArray["uploader"] = $ubcar_media_author->first_name . ' ' . $ubcar_media_author->last_name . ' ( ' . $ubcar_media_author->user_login . ' )';
+			$tempArray["uploader"] = $ubcar_media_author->first_name . ' ' . $ubcar_media_author->last_name . ' (' . $ubcar_media_author->user_login . ')';
 			$tempArray["title"] = $ubcar_media->post_title;
 			$tempArray["date"] = get_the_date( 'Y-m-d', $ubcar_media->ID );
 			$tempArray["description"] = $ubcar_media->post_content;
@@ -472,7 +477,7 @@
 		 * @return void
 		 */
 		function ubcar_media_forward() {
-			$this->ubcar_media_get_medias( intval( $_POST['ubcar_media_offset'] ) * 10, $this->ubcar_media_data_cleaner( $_POST['ubcar_author_name'] ) );
+			$this->ubcar_media_get_medias( intval( $_POST['ubcar_media_offset'] ) * 25, $this->ubcar_media_data_cleaner( $_POST['ubcar_author_name'] ) );
 		}
 
 		/**
@@ -484,12 +489,29 @@
 		 * @return void
 		 */
 		function ubcar_media_backward() {
-			$back_media = ( intval( $_POST['ubcar_media_offset'] ) - 2 ) * 10;
+			$back_media = ( intval( $_POST['ubcar_media_offset'] ) - 2 ) * 25;
 			if( $back_media < 0 ) {
 				$back_media = 0;
 			}
 			$this->ubcar_media_get_medias( $back_media, $this->ubcar_media_data_cleaner( $_POST['ubcar_author_name'] ) );
 		}
+
+		/**
+		 * This is the callback function for ubcar-media-updater.js's
+		 * goto_medias() AJAX request, displaying the selected set of
+		 * ubcar_media posts.
+		 *
+		 * @access public
+		 * @return void
+		 */
+		function ubcar_media_goto() {
+			$goto_media = ( intval( $_POST['ubcar_media_offset'] ) - 1 ) * 25;
+			if( $goto_media < 0 ) {
+				$goto_media = 0;
+			}
+			$this->ubcar_media_get_medias( $goto_media );
+		}
+
 
 		/**
 		 * This is the callback function for ubcar-media-updater.js's

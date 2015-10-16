@@ -63,6 +63,12 @@ jQuery( document ).ready(function() {
 		jQuery( window ).scrollTop( jQuery( '.ubcar-content' ).offset().top - 40 );
 	});
 
+	// Test to see if the one-pane, unified data display option is selected in full-width display mode
+	if( jQuery( '#ubcar-point-media' ).html() === undefined &&  jQuery( '#ubcar-header-aggregate' ).css( 'bottom' ) !== 'auto' ) {
+		jQuery( '#ubcar-header-aggregate' ).css( 'bottom', '270px' );
+		jQuery( '#ubcar-header-information' ).css( 'bottom', '225px' );
+	}
+
 	ubcarMap.requestDetector();
 
 });
@@ -491,6 +497,14 @@ function UBCARMap( map ) {
 
 		jQuery( '#ubcar-body-information' ).html( htmlStringDescription );
 		jQuery( '#ubcar-body-media' ).html( htmlStringMedia );
+
+		// Test to see if the one-pane, unified data display option is selected in full-width display mode
+		if( jQuery( '#ubcar-point-media' ).html() === undefined &&  jQuery( '#ubcar-header-aggregate' ).css( 'bottom' ) !== 'auto' ) {
+			jQuery( '#ubcar-body-information' ).append( "<br /><hr /><br />" );
+			jQuery( '#ubcar-body-information' ).append( htmlStringMedia );
+		} else {
+			jQuery( '#ubcar-body-media' ).html( htmlStringMedia );
+		}
 
 		jQuery( '.ubcar-wiki-header' ).click(function() {
 			wikiID = jQuery( this ).attr( 'id' ).replace( 'ubcar-wiki-header-', '' );

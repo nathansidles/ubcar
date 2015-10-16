@@ -7,7 +7,7 @@ jQuery( document ).ready(function( $ ) {
 	};
 	jQuery.post( ajax_object.ajax_url, data, function( response ) {
 		displayMedias( response );
-		if( response.length < 10 ) {
+		if( response.length < 25 ) {
 			jQuery( '#ubcar-media-forward' ).hide();
 		}
 		jQuery( '#ubcar-media-back' ).hide();
@@ -86,6 +86,10 @@ jQuery( document ).ready(function( $ ) {
 		deleteMedias();
 	});
 
+	jQuery( '#ubcar-media-goto' ).click(function() {
+		goToMedias();
+	});
+
 });
 
 /**
@@ -105,7 +109,7 @@ function forwardMedias() {
 		displayMedias( response );
 		currentPage = parseInt( jQuery( '#ubcar-media-display-count' ).html() );
 		jQuery( '#ubcar-media-display-count' ).html( currentPage + 1 );
-		if( response.length < 10 ) {
+		if( response.length < 25 ) {
 			jQuery( '#ubcar-media-forward' ).hide();
 		} else {
 			jQuery( '#ubcar-media-forward' ).show();
@@ -139,6 +143,39 @@ function backwardMedias() {
 }
 
 /**
+ * AJAX call to class-ubcar-admin-media.php's ubcar_media_goto(),
+ * going to the designated media page
+ */
+function goToMedias() {
+	var data, currentPage, desiredPage;
+	desiredPage = escapeHTML( jQuery( '#ubcar-media-choose-count' ).val() );
+	if( desiredPage > escapeHTML( jQuery( '#ubcar-media-max-count' ).html() ) ) {
+		desiredPage = escapeHTML( jQuery( '#ubcar-media-max-count' ).html() );
+	} else if( desiredPage < 1 ) {
+		desiredPage = 1;
+	}
+	data = {
+		'action' : 'media_goto',
+		'ubcar_media_offset' : desiredPage
+	};
+	jQuery.post( ajax_object.ajax_url, data, function( response ) {
+		displayMedias( response );
+		currentPage = desiredPage;
+		jQuery( '#ubcar-media-choose-count' ).val( currentPage );
+		jQuery( '#ubcar-media-display-count' ).html( currentPage );
+		if( currentPage === 1 ) {
+			jQuery( '#ubcar-media-back' ).hide();
+		}
+		if( response.length < 25 ) {
+			jQuery( '#ubcar-media-forward' ).hide();
+		} else {
+			jQuery( '#ubcar-media-forward' ).show();
+		}
+	});
+	jQuery( '#ubcar-media-forward' ).show();
+}
+
+/**
  * AJAX call to class-ubcar-admin-medium.php's ubcar_media_delete(), deleting
  * the selected ubcar_medium post.
  *
@@ -162,7 +199,7 @@ function deleteMedias( deleteID ) {
 				displayMedias( response );
 				jQuery( '#ubcar-media-display_count' ).html( 1 );
 				jQuery( '#ubcar-media-back' ).hide();
-				if( response.length < 10 ) {
+				if( response.length < 25 ) {
 					jQuery( '#ubcar-media-forward' ).hide();
 				} else {
 					jQuery( '#ubcar-media-forward' ).show();

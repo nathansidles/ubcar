@@ -113,6 +113,10 @@
 		function menu_page() {
 			if ( !current_user_can( 'edit_pages' ) ) {
 				add_menu_page( 'UBCAR', 'UBCAR', 'read', 'ubcar-media', array( $this->ubcar_admin_media, 'menu_initializer' ) );
+				if( get_option( 'ubcar_point_choice' ) == '1' ) {
+					add_submenu_page( 'ubcar-media', 'UBCAR Points', 'Points', 'read', 'ubcar-points', array( $this->ubcar_admin_points, 'menu_initializer' )  );
+					add_submenu_page( 'ubcar-media', 'UBCAR Tours', 'Tours', 'read', 'ubcar-tours', array( $this->ubcar_admin_tours, 'menu_initializer' ) );
+				}
 			} else {
 				add_menu_page( 'UBCAR', 'UBCAR', 'edit_pages', 'ubcar', array( $this, 'menu_initializer' ) );
 				add_submenu_page( 'ubcar', 'UBCAR Layers', 'Layers', 'manage_options', 'ubcar-layers', array( $this->ubcar_admin_layers, 'menu_initializer' ) );
@@ -166,22 +170,54 @@
 							?>
 						</td>
 					</tr>
-				</table>
-				<h3>App Settings</h3>
-				<table class="form-table">
 					<tr>
-						<th scope="row"><label for="ubcar_app_title">In-App Title</label></th>
+						<th scope="row"><label for="ubcar_display_choice">UBCAR Data Display Choice</label></th>
 						<td>
 							<?php
-								echo '<input name="ubcar-app-title" type="text" id="ubcar-app-title" value="' . get_option( 'ubcar_app_title' ) . '" class="regular-text ltr" />';
+								echo '<input name="ubcar-display-choice" type="radio" id="ubcar-display-choice-1" ';
+								if( get_option( 'ubcar_display_choice' ) == 'separate' || get_option( 'ubcar_display_choice' ) == '' ) {
+									echo 'checked ';
+								}
+								echo '/> Separate Media/Point Information Panes<br />';
+								echo '<input name="ubcar-display-choice" type="radio" id="ubcar-display-choice-2" ';
+								if( get_option( 'ubcar_display_choice' ) == 'unified' ) {
+									echo 'checked ';
+								}
+								echo '/> Unified Data Pane';
 							?>
 						</td>
 					</tr>
 					<tr>
-						<th scope="row"><label for="ubcar_app_introduction">In-App Introduction Text</label></th>
+						<th scope="row"><label for="ubcar_point_choice">UBCAR Subscriber Point Creation/Editing</label></th>
 						<td>
 							<?php
-								echo '<textarea rows="5" type="textfield" id="ubcar-app-introduction" class="regular-text ltr" />' . get_option( 'ubcar_app_introduction' ) . '</textarea>';
+								echo '<input name="ubcar-point-choice" type="radio" id="ubcar-point-choice-1" ';
+								if( get_option( 'ubcar_point_choice' ) == '0' || get_option( 'ubcar_point_choice' ) == '' ) {
+									echo 'checked ';
+								}
+								echo '/> Not Allowed<br />';
+								echo '<input name="ubcar-point-choice" type="radio" id="ubcar-point-choice-2" ';
+								if( get_option( 'ubcar_point_choice' ) == '1' ) {
+									echo 'checked ';
+								}
+								echo '/> Allowed';
+							?>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row"><label for="ubcar_tour_choice">UBCAR Subscriber Tour Creation/Editing</label></th>
+						<td>
+							<?php
+								echo '<input name="ubcar-tour-choice" type="radio" id="ubcar-tour-choice-1" ';
+								if( get_option( 'ubcar_tour_choice' ) == '0' || get_option( 'ubcar_tour_choice' ) == '' ) {
+									echo 'checked ';
+								}
+								echo '/> Not Allowed<br />';
+								echo '<input name="ubcar-tour-choice" type="radio" id="ubcar-tour-choice-2" ';
+								if( get_option( 'ubcar_tour_choice' ) == '1' ) {
+									echo 'checked ';
+								}
+								echo '/> Allowed';
 							?>
 						</td>
 					</tr>
@@ -200,9 +236,10 @@
 		function ubcar_options_updater_callback() {
 			if( current_user_can( 'edit_pages' ) ) {
 				update_option( 'ubcar_css_choice', esc_attr( $_POST['ubcar_css_choice'] ) );
+				update_option( 'ubcar_display_choice', esc_attr( $_POST['ubcar_display_choice'] ) );
+				update_option( 'ubcar_point_choice', esc_attr( $_POST['ubcar_point_choice'] ) );
+				update_option( 'ubcar_tour_choice', esc_attr( $_POST['ubcar_tour_choice'] ) );
 				update_option( 'ubcar_google_maps_api_key', esc_attr( $_POST['ubcar_google_maps_api_key'] ) );
-				update_option( 'ubcar_app_title', esc_attr( $_POST['ubcar_app_title'] ) );
-				update_option( 'ubcar_app_introduction', esc_attr( $_POST['ubcar_app_introduction'] ) );
 				echo 'UBCAR options updated!';
 			} else {
 				echo 'You do not have privileges to update these options.';

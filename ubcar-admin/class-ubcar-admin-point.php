@@ -43,6 +43,7 @@
 			add_action( 'wp_ajax_point_forward', array( $this, 'ubcar_point_forward' ) );
 			add_action( 'wp_ajax_point_backward', array( $this, 'ubcar_point_backward' ) );
 			add_action( 'wp_ajax_point_delete', array( $this, 'ubcar_point_delete' ) );
+			add_action( 'wp_ajax_point_goto', array( $this, 'ubcar_point_goto' ) );
 			add_action( 'wp_ajax_point_edit', array( $this, 'ubcar_point_edit' ) );
 			add_action( 'wp_ajax_point_edit_submit', array( $this, 'ubcar_point_edit_submit' ) );
 		}
@@ -111,9 +112,13 @@
 			<h3>Manage Existing points</h3>
 			<table class="ubcar-table" id="ubcar-point-table">
 			</table>
+			<div class="ubcar-goto">
+				<input type="text" id="ubcar-point-choose-count" style="width:40px;">
+				<input type="submit" id="ubcar-point-goto" value="Go to Page">
+			</div>
 			<div class="ubcar-forward-back">
 				<a class="ubcar-forward-back-control" id="ubcar-point-back">Prev</a>
-				<span id="ubcar-point-display-count">1</span>
+				<span id="ubcar-point-display-count">1</span> of <span id="ubcar-point-max-count"><?php echo max( ( ceil( wp_count_posts('ubcar_point')->publish / 25 ) ), 1 ); ?></span>
 				<a class="ubcar-forward-back-control" id="ubcar-point-forward">Next</a>
 			</div>
 			<?php
@@ -161,8 +166,13 @@
 		 */
 		function ubcar_point_get_points( $ubcar_point_offset ) {
 			global $wpdb;
-			$ubcar_points = get_posts( array( 'posts_per_page' => 10, 'offset' => $ubcar_point_offset, 'order' => 'DESC', 'post_type' => 'ubcar_point' ) );
+			$ubcar_get_points_parameters = array( 'posts_per_page' => 25, 'offset' => $ubcar_point_offset, 'order' => 'DESC', 'post_type' => 'ubcar_point' );
 			$response = array();
+			if ( !current_user_can( 'edit_pages' ) ) {
+				$ubcar_current_user = wp_get_current_user();
+				$ubcar_get_points_parameters['author_name'] = $ubcar_current_user->user_login;
+			}
+			$ubcar_points = get_posts( $ubcar_get_points_parameters );
 			foreach ( $ubcar_points as $ubcar_point ) {
 				$tempArray = $this->ubcar_get_point( $ubcar_point->ID );
 				array_push( $response, $tempArray );
@@ -217,7 +227,7 @@
 		 * @return void
 		 */
 		function ubcar_point_forward() {
-			$this->ubcar_point_get_points( intval( $_POST['ubcar_point_offset'] ) * 10 );
+			$this->ubcar_point_get_points( intval( $_POST['ubcar_point_offset'] ) * 25 );
 		}
 
 		/**
@@ -229,12 +239,29 @@
 		 * @return void
 		 */
 		function ubcar_point_backward() {
-			$back_point = ( intval( $_POST['ubcar_point_offset'] ) - 2 ) * 10;
+			$back_point = ( intval( $_POST['ubcar_point_offset'] ) - 2 ) * 25;
 			if( $back_point < 0 ) {
 				$back_point = 0;
 			}
 			$this->ubcar_point_get_points( $back_point );
 		}
+
+		/**
+		 * This is the callback function for ubcar-point-updater.js's
+		 * goto_points() AJAX request, displaying the selected set of
+		 * ubcar_point posts.
+		 *
+		 * @access public
+		 * @return void
+		 */
+		function ubcar_point_goto() {
+			$goto_point = ( intval( $_POST['ubcar_point_offset'] ) - 1 ) * 25;
+			if( $goto_point < 0 ) {
+				$goto_point = 0;
+			}
+			$this->ubcar_point_get_points( $goto_point );
+		}
+
 
 		/**
 		 * This is the callback function for ubcar-point-updater.js's

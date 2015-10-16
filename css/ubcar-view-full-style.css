@@ -70,59 +70,59 @@
 
 	#ubcar-header-aggregate {
 		right: 10px;
-		bottom: 265px;
+		bottom: 315px;
 		font-size: 12px;
 		padding: 0px;
 	}
 
 	#ubcar-header-information {
 		right: 10px;
-		bottom: 220px;
+		bottom: 270px;
 		font-size: 12px;
 		padding: 0px;
 	}
 
 	#ubcar-header-media {
 		right: 10px;
-		bottom: 175px;
+		bottom: 225px;
 		font-size: 12px;
 		padding: 0px;
 	}
 
 	#ubcar-header-comments {
 		right: 10px;
-		bottom: 130px;
+		bottom: 180px;
 		font-size: 12px;
 		padding: 0px;
 	}
 
 	#ubcar-header-comments-submit {
 		right: 10px;
-		bottom: 85px;
+		bottom: 135px;
 		font-size: 12px;
 		padding: 0px;
 	}
 
 	#ubcar-header-media-submit {
 		right: 10px;
-		bottom: 40px;
+		bottom: 90px;
 		font-size: 12px;
 		padding: 0px;
 	}
 
 	#ubcar-display-fullscreen {
 		right: 10px;
-		top: 80px;
+		top: 10px;
 	}
 
 	#ubcar-display-choice-map {
 		right: 10px;
-		top: 125px;
+		top: 55px;
 	}
 
 	#ubcar-display-choice-street {
 		right: 10px;
-		top: 170px;
+		top: 100px;
 	}
 
 	.ubcar-display-fullscreen-move {
@@ -160,7 +160,7 @@
 	.ubcar-body {
 		position: absolute;
 		right: 95px;
-		bottom: 40px;
+		bottom: 90px;
 		width: 40%;
 		border: 1px solid #002145;
 		border-radius: 5px;
