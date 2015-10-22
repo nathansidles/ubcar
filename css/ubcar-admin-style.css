@@ -28,6 +28,11 @@
 	width: 80%;
 }
 
+.ubcar-goto {
+	display: block;
+	float: left;
+}
+
 .ubcar-forward-back {
 	display: block;
 	float: right;
@@ -103,7 +108,7 @@
 	border: 1px solid grey;
 	background: white;
 	border-radius: 2px;
-	overflow: scroll;
+	overflow: auto;
 	max-height: 500px;
 	min-height: 20px;
 }

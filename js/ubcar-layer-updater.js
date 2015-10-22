@@ -1,36 +1,40 @@
 jQuery( document ).ready(function( $ ) {
-	
+
 	var data = {
 		'action' : 'layer_initial',
 		'ubcar_layer_offset' : escapeHTML( jQuery( '#ubcar-layer-display-count' ).val() )
 	};
 	jQuery.post( ajax_object.ajax_url, data, function( response ) {
 		displayLayers( response );
-		if( response.length < 10 ) {
+		if( response.length < 25 ) {
 			jQuery( '#ubcar-layer-forward' ).hide();
 		}
 		jQuery( '#ubcar-layer-back' ).hide();
 	});
-	
+
 	// ubcar layer updater
 	jQuery( '#ubcar-layer-submit' ).click(function() {
 		updateLayers();
 	});
-	
+
 	// ubcar layer forward
 	jQuery( '#ubcar-layer-forward' ).click(function() {
 		forwardLayers();
 	});
-	
+
 	// ubcar layer backward
 	jQuery( '#ubcar-layer-back' ).click(function() {
 		backwardLayers();
 	});
-	
+
 	jQuery( '[ id^=ubcar-layer-delete- ]' ).click(function() {
 		deleteLayers();
 	});
-	
+
+	jQuery( '#ubcar-layer-goto' ).click(function() {
+		goToLayers();
+	});
+
 });
 
 /**
@@ -55,7 +59,7 @@ function updateLayers() {
 			displayLayers( response );
 			jQuery( '#ubcar-layer-display-count' ).html( 1 );
 			jQuery( '#ubcar-layer-back' ).hide();
-			if( response.length < 10 ) {
+			if( response.length < 25 ) {
 				jQuery( '#ubcar-layer-forward' ).hide();
 			} else {
 				jQuery( '#ubcar-layer-forward' ).show();
@@ -78,7 +82,7 @@ function forwardLayers() {
 		displayLayers( response );
 		currentPage = parseInt( jQuery( '#ubcar-layer-display-count' ).html() );
 		jQuery( '#ubcar-layer-display-count' ).html( currentPage + 1 );
-		if( response.length < 10 ) {
+		if( response.length < 25 ) {
 			jQuery( '#ubcar-layer-forward' ).hide();
 		} else {
 			jQuery( '#ubcar-layer-forward' ).show();
@@ -109,9 +113,43 @@ function backwardLayers() {
 }
 
 /**
+ * AJAX call to class-ubcar-admin-layer.php's ubcar_layer_goto(),
+ * going to the designated layer page
+ */
+function goToLayers() {
+	var data, currentPage, desiredPage, maxPage;
+	desiredPage = parseInt( jQuery( '#ubcar-layer-choose-count' ).val() );
+	maxPage = parseInt( jQuery( '#ubcar-layer-max-count' ).html() )
+	if( desiredPage > maxPage ) {
+		desiredPage = maxPage;
+	} else if( desiredPage < 1 ) {
+		desiredPage = 1;
+	}
+	data = {
+		'action' : 'layer_goto',
+		'ubcar_layer_offset' : desiredPage
+	};
+	jQuery.post( ajax_object.ajax_url, data, function( response ) {
+		displayLayers( response );
+		currentPage = desiredPage;
+		jQuery( '#ubcar-layer-choose-count' ).val( currentPage );
+		jQuery( '#ubcar-layer-display-count' ).html( currentPage );
+		if( currentPage === 1 ) {
+			jQuery( '#ubcar-layer-back' ).hide();
+		}
+		if( response.length < 25 ) {
+			jQuery( '#ubcar-layer-forward' ).hide();
+		} else {
+			jQuery( '#ubcar-layer-forward' ).show();
+		}
+	});
+	jQuery( '#ubcar-layer-forward' ).show();
+}
+
+/**
  * AJAX call to class-ubcar-admin-layer.php's ubcar_layer_delete(), deleting the
  * selected ubcar_layer post.
- * 
+ *
  * @param {Number} deleteID
  */
 function deleteLayers( deleteID ) {
@@ -129,7 +167,7 @@ function deleteLayers( deleteID ) {
 				displayLayers( response );
 				jQuery( '#ubcar-layer-display-count' ).html( 1 );
 				jQuery( '#ubcar-layer-back' ).hide();
-				if( response.length < 10 ) {
+				if( response.length < 25 ) {
 					jQuery( '#ubcar-layer-forward' ).hide();
 				} else {
 					jQuery( '#ubcar-layer-forward' ).show();
@@ -141,7 +179,7 @@ function deleteLayers( deleteID ) {
 
 /**
  * Helper function to display retrieved ubcar_layer posts data.
- * 
+ *
  * @param {Object[]} response JSON object of ubcar_layer posts' data
  */
 function displayLayers( response ) {
@@ -178,17 +216,17 @@ function displayLayers( response ) {
 			htmlString = 'No layers found.';
 		}
 		jQuery( '#ubcar-layer-table' ).html( htmlString );
-		
+
 		jQuery( '[ id^=ubcar-layer-delete- ]' ).click(function() {
 			deleteID = jQuery( this ).attr( 'id' ).replace( 'ubcar-layer-delete-', '' );
 			deleteLayers( deleteID );
 		});
-		
+
 		jQuery( '[ id^=ubcar-layer-edit- ]' ).click(function() {
 			editID = jQuery( this ).attr( 'id' ).replace( 'ubcar-layer-edit-', '' );
 			editLayers( editID );
 		});
-	
+
 	} else {
 		alert( 'An UBCAR error has occurred. Please log out and try again.' );
 	}
@@ -197,7 +235,7 @@ function displayLayers( response ) {
 /**
  * AJAX call to class-ubcar-admin-layer.php's ubcar_layer_edit(), retrieving an
  * ubcar_layer post's data and formatting it for editing.
- * 
+ *
  * @param {Number} editID
  */
 function editLayers( editID ) {
@@ -238,7 +276,7 @@ function editLayers( editID ) {
 				htmlString += response.ID;
 				htmlString += '">Upload Edit</div></td>';
 				jQuery( '#' + 'ubcar-layer-line-' + response.ID ).html( htmlString );
-			
+
 			}
 		}
 		jQuery( '#ubcar-layer-edit-submit-' + editID ).click(function() {
@@ -250,7 +288,7 @@ function editLayers( editID ) {
 /**
  * AJAX call to class-ubcar-admin-layer.php's ubcar_layer_edit_submit(),
  * submitting an ubcar_layer post's edited information and displaying it
- * 
+ *
  * @param {Number} thisthis The unique div of the post to be submitted
  */
 function editLayersSubmit( thisthis ) {
@@ -268,9 +306,9 @@ function editLayersSubmit( thisthis ) {
 		if( response === false ) {
 			alert( 'Sorry, you do not have permission to delete that layer.' );
 		} else {
-		
+
 			if( Object.prototype.toString.call( response ) === '[object Object]' ) {
-		
+
 				htmlString = '<td>';
 				htmlString += response.ID;
 				htmlString += '</td><td>';
@@ -287,7 +325,7 @@ function editLayersSubmit( thisthis ) {
 				}
 				htmlString += ' disabled></td><td>Updated!</td>';
 				jQuery( '#' + 'ubcar-layer-line-' + response.ID ).html( htmlString );
-			
+
 			}
 		}
 	});

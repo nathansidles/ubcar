@@ -384,7 +384,11 @@ function UBCARMap( ) {
 					htmlStringMedia += response.ubcar_media[ i ].image;
 					htmlStringMedia += '</a>';
 				} else if( response.ubcar_media[ i ].type === 'video' ) {
-					htmlStringMedia += '<iframe width="100%" height="300" src="//www.youtube.com/embed/' + response.ubcar_media[ i ].url + '" frameborder="0" allowfullscreen></iframe>';
+					if( response.ubcar_media[ i ].video_type === 'youtube' ) {
+						htmlStringMedia += '<iframe width="100%" height="300" src="//www.youtube.com/embed/' + response.ubcar_media[ i ].url + '" frameborder="0" allowfullscreen></iframe>';
+					} else if( response.ubcar_media[ i ].video_type === 'vimeo' ) {
+						htmlStringMedia += '<iframe src="https://player.vimeo.com/video/' + response.ubcar_media[ i ].url  + '" width="100%" height="300" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
+					}
 				} else if( response.ubcar_media[ i ].type === 'audio' ) {
 					htmlStringMedia += '<iframe width="100%" height="150" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/' + response.ubcar_media[ i ].url + '&amp;auto_play=false&amp;hide_related=true&amp;show_comments=false&amp;show_user=true&amp;show_reposts=false&amp;visual=false"></iframe>';
 				}

@@ -7,7 +7,7 @@ jQuery( document ).ready(function( $ ) {
 	};
 	jQuery.post( ajax_object.ajax_url, data, function( response ) {
 		displayMedias( response );
-		if( response.length < 10 ) {
+		if( response.length < 25 ) {
 			jQuery( '#ubcar-media-forward' ).hide();
 		}
 		jQuery( '#ubcar-media-back' ).hide();
@@ -86,6 +86,10 @@ jQuery( document ).ready(function( $ ) {
 		deleteMedias();
 	});
 
+	jQuery( '#ubcar-media-goto' ).click(function() {
+		goToMedias();
+	});
+
 });
 
 /**
@@ -105,7 +109,7 @@ function forwardMedias() {
 		displayMedias( response );
 		currentPage = parseInt( jQuery( '#ubcar-media-display-count' ).html() );
 		jQuery( '#ubcar-media-display-count' ).html( currentPage + 1 );
-		if( response.length < 10 ) {
+		if( response.length < 25 ) {
 			jQuery( '#ubcar-media-forward' ).hide();
 		} else {
 			jQuery( '#ubcar-media-forward' ).show();
@@ -139,6 +143,40 @@ function backwardMedias() {
 }
 
 /**
+ * AJAX call to class-ubcar-admin-media.php's ubcar_media_goto(),
+ * going to the designated media page
+ */
+function goToMedias() {
+	var data, currentPage, desiredPage, maxPage;
+	desiredPage = parseInt( jQuery( '#ubcar-media-choose-count' ).val() );
+	maxPage = parseInt( jQuery( '#ubcar-media-max-count' ).html() )
+	if( desiredPage > maxPage ) {
+		desiredPage = maxPage;
+	} else if( desiredPage < 1 ) {
+		desiredPage = 1;
+	}
+	data = {
+		'action' : 'media_goto',
+		'ubcar_media_offset' : desiredPage
+	};
+	jQuery.post( ajax_object.ajax_url, data, function( response ) {
+		displayMedias( response );
+		currentPage = desiredPage;
+		jQuery( '#ubcar-media-choose-count' ).val( currentPage );
+		jQuery( '#ubcar-media-display-count' ).html( currentPage );
+		if( currentPage === 1 ) {
+			jQuery( '#ubcar-media-back' ).hide();
+		}
+		if( response.length < 25 ) {
+			jQuery( '#ubcar-media-forward' ).hide();
+		} else {
+			jQuery( '#ubcar-media-forward' ).show();
+		}
+	});
+	jQuery( '#ubcar-media-forward' ).show();
+}
+
+/**
  * AJAX call to class-ubcar-admin-medium.php's ubcar_media_delete(), deleting
  * the selected ubcar_medium post.
  *
@@ -162,7 +200,7 @@ function deleteMedias( deleteID ) {
 				displayMedias( response );
 				jQuery( '#ubcar-media-display_count' ).html( 1 );
 				jQuery( '#ubcar-media-back' ).hide();
-				if( response.length < 10 ) {
+				if( response.length < 25 ) {
 					jQuery( '#ubcar-media-forward' ).hide();
 				} else {
 					jQuery( '#ubcar-media-forward' ).show();
@@ -199,7 +237,11 @@ function displayMedias( response ) {
 				htmlString += response[ i ].title;
 				htmlString += '" /></a>';
 			} else if( response[ i ].type === 'video' ) {
-				htmlString += '<iframe width="150" height="150" src="//www.youtube.com/embed/' + response[ i ].url + '" frameborder="0" allowfullscreen></iframe>';
+				if( response[ i ].video_type === 'youtube' ) {
+					htmlString += '<iframe width="150" height="150" src="//www.youtube.com/embed/' + response[ i ].url + '" frameborder="0" allowfullscreen></iframe>';
+				} else if ( response[ i ].video_type === 'vimeo' ) {
+					htmlString += '<iframe src="https://player.vimeo.com/video/' + response[ i ].url  + '" width="150" height="150" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
+				}
 			} else if( response[ i ].type === 'audio' ) {
 				htmlString += '<iframe width="150" height="150" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/' + response[ i ].url + '&amp;auto_play=false&amp;hide_related=true&amp;show_comments=false&amp;show_user=true&amp;show_reposts=false&amp;visual=false"></iframe>';
 			} else if( response[ i ].type === 'external' || response[ i ].type === 'wiki' ) {
@@ -287,7 +329,11 @@ function editMedias( editID ) {
 					htmlString += response.title;
 					htmlString += '" /></a>';
 				} else if( response.type === 'video' ) {
-					htmlString += '<iframe width="150" height="150" src="//www.youtube.com/embed/' + response.url + '" frameborder="0" allowfullscreen></iframe>';
+					if( response.video_type === 'youtube' ) {
+						htmlString += '<iframe width="150" height="150" src="//www.youtube.com/embed/' + response.url + '" frameborder="0" allowfullscreen></iframe>';
+					} else if ( response.video_type === 'vimeo' ) {
+						htmlString += '<iframe src="https://player.vimeo.com/video/' + response.url  + '" width="150" height="150" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
+					}
 				} else if( response.type === 'audio' ) {
 					htmlString += '<iframe width="150" height="150" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/' + response.url + '&amp;auto_play=false&amp;hide_related=true&amp;show_comments=false&amp;show_user=true&amp;show_reposts=false&amp;visual=false"></iframe>';
 				} else if( response.type === 'external' || response.type === 'wiki' ) {
@@ -423,7 +469,11 @@ function editMediasSubmit( thisthis, old_selectedLayers, old_location ) {
 					htmlString += response.title;
 					htmlString += '" /></a>';
 				} else if( response.type === 'video' ) {
-					htmlString += '<iframe width="150" height="150" src="//www.youtube.com/embed/' + response.url + '" frameborder="0" allowfullscreen></iframe>';
+					if( response.video_type === 'youtube' ) {
+						htmlString += '<iframe width="150" height="150" src="//www.youtube.com/embed/' + response.url + '" frameborder="0" allowfullscreen></iframe>';
+					} else if ( response.video_type === 'vimeo' ) {
+						htmlString += '<iframe src="https://player.vimeo.com/video/' + response.url  + '" width="150" height="150" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
+					}
 				} else if( response.type === 'audio' ) {
 					htmlString += '<iframe width="150" height="150" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/' + response.url + '&amp;auto_play=false&amp;hide_related=true&amp;show_comments=false&amp;show_user=true&amp;show_reposts=false&amp;visual=false"></iframe>';
 				} else if( response.type === 'external' || response.type === 'wiki' ) {

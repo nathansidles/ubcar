@@ -1,42 +1,46 @@
 jQuery( document ).ready(function( $ ) {
-	
+
 	var data = {
 		'action' : 'tour_initial',
 		'ubcar_tour_offset' : escapeHTML( jQuery( '#ubcar-tour-display-count' ).val() )
 	};
 	jQuery.post( ajax_object.ajax_url, data, function( response ) {
 		displayTours( response );
-		if( response.length < 10 ) {
+		if( response.length < 25 ) {
 			jQuery( '#ubcar-tour-forward' ).hide();
 		}
 		jQuery( '#ubcar-tour-back' ).hide();
 	});
-	
+
 	// ubcar tour updater
 	jQuery( '#ubcar-tour-submit' ).click(function() {
 		updateTours();
 	});
-	
+
 	// ubcar tour forward
 	jQuery( '#ubcar-tour-forward' ).click(function() {
 		forwardTours();
 	});
-	
+
 	// ubcar tour backward
 	jQuery( '#ubcar-tour-back' ).click(function() {
 		backwardTours();
 	});
-	
+
 	jQuery( '[ id^=ubcar-tour-delete- ]' ).click(function() {
 		deleteTours();
 	});
-	
+
+	jQuery( '#ubcar-tour-goto' ).click(function() {
+		goToTours();
+	});
+
 	jQuery(function() {
 		jQuery( '#ubcar-tour-locations-selected-list, #ubcar-tour-locations-complete-list' ).sortable( {
 			connectWith: '.ubcar-tour-order-locations'
 		});
 	});
-	
+
 });
 
 /**
@@ -65,7 +69,7 @@ function updateTours() {
 			displayTours( response );
 			jQuery( '#ubcar-tour-display-count' ).html( 1 );
 			jQuery( '#ubcar-tour-back' ).hide();
-			if( response.length < 10 ) {
+			if( response.length < 25 ) {
 				jQuery( '#ubcar-tour-forward' ).hide();
 			} else {
 				jQuery( '#ubcar-tour-forward' ).show();
@@ -90,7 +94,7 @@ function forwardTours() {
 		displayTours( response );
 		currentPage = parseInt( jQuery( '#ubcar-tour-display-count' ).html() );
 		jQuery( '#ubcar-tour-display-count' ).html( currentPage + 1 );
-		if( response.length < 10 ) {
+		if( response.length < 25 ) {
 			jQuery( '#ubcar-tour-forward' ).hide();
 		} else {
 			jQuery( '#ubcar-tour-forward' ).show();
@@ -104,9 +108,9 @@ function forwardTours() {
  * decrementing the displayed ubcar_tour posts
  */
 function backwardTours() {
-	
+
 	var data, currentPage;
-	
+
 	data = {
 		'action' : 'tour_backward',
 		'ubcar_tour_offset' : escapeHTML( jQuery( '#ubcar-tour-display-count' ).html() )
@@ -123,9 +127,43 @@ function backwardTours() {
 }
 
 /**
+ * AJAX call to class-ubcar-admin-tour.php's ubcar_tour_goto(),
+ * going to the designated tour page
+ */
+function goToTours() {
+	var data, currentPage, desiredPage, maxPage;
+	desiredPage = parseInt( jQuery( '#ubcar-tour-choose-count' ).val() );
+	maxPage = parseInt( jQuery( '#ubcar-tour-max-count' ).html() )
+	if( desiredPage > maxPage ) {
+		desiredPage = maxPage;
+	} else if( desiredPage < 1 ) {
+		desiredPage = 1;
+	}
+	data = {
+		'action' : 'tour_goto',
+		'ubcar_tour_offset' : desiredPage
+	};
+	jQuery.post( ajax_object.ajax_url, data, function( response ) {
+		displayTours( response );
+		currentPage = desiredPage;
+		jQuery( '#ubcar-tour-choose-count' ).val( currentPage );
+		jQuery( '#ubcar-tour-display-count' ).html( currentPage );
+		if( currentPage === 1 ) {
+			jQuery( '#ubcar-tour-back' ).hide();
+		}
+		if( response.length < 25 ) {
+			jQuery( '#ubcar-tour-forward' ).hide();
+		} else {
+			jQuery( '#ubcar-tour-forward' ).show();
+		}
+	});
+	jQuery( '#ubcar-tour-forward' ).show();
+}
+
+/**
  * AJAX call to class-ubcar-admin-tour.php's ubcar_tour_delete(), deleting the
  * selected ubcar_tour post.
- * 
+ *
  * @param {Number} deleteID
  */
 function deleteTours( deleteID ) {
@@ -142,7 +180,7 @@ function deleteTours( deleteID ) {
 				displayTours( response );
 				jQuery( '#ubcar-tour-display-count' ).html( 1 );
 				jQuery( '#ubcar-tour-back' ).hide();
-				if( response.length < 10 ) {
+				if( response.length < 25 ) {
 					jQuery( '#ubcar-tour-forward' ).hide();
 				} else {
 					jQuery( '#ubcar-tour-forward' ).show();
@@ -154,18 +192,18 @@ function deleteTours( deleteID ) {
 
 /**
  * Helper function to display retrieved ubcar_tour posts data.
- * 
+ *
  * @param {Object[]} response JSON object of ubcar_tour posts' data
  */
 function displayTours( response ) {
-	
+
 	if( Object.prototype.toString.call( response ) === '[object Array]' ) {
-	
+
 	var htmlString, deleteID, editID;
-	
+
 	var htmlString = '<tr><td>ID</td><td>Title</td><td>Uploader</td><td>Date Uploaded</td><td>Description</td><td>Locations</td><td>Action</td></tr>';
 	for( i in response ) {
-	
+
 		htmlString += '<tr id="ubcar-tour-line-';
 		htmlString += response[ i ].ID;
 		htmlString += '"><td>';
@@ -178,7 +216,7 @@ function displayTours( response ) {
 		htmlString += response[ i ].date;
 		htmlString += '</td><td>';
 		htmlString += response[ i ].description;
-		htmlString += '</td><td><div style="max-height: 200px; overflow: scroll">';
+		htmlString += '</td><td><div style="max-height: 200px; overflow: auto">';
 		htmlString += '<ol id="ubcar-tour-locations-display">';
 		for( j in response[ i ].locations ) {
 			htmlString += '<li>' + response[ i ].locations[ j ].title + ' ( #' + response[ i ].locations[ j ].ID + ' )</li>';
@@ -194,16 +232,16 @@ function displayTours( response ) {
 		htmlString = 'No tours found.';
 	}
 	jQuery( '#ubcar-tour-table' ).html( htmlString );
-	
+
 	} else {
 		alert( 'An UBCAR error has occurred. Please log out and log in again.' );
 	}
-	
+
 	jQuery( '[ id^=ubcar-tour-delete- ]' ).click(function() {
 		deleteID = jQuery( this ).attr( 'id' ).replace( 'ubcar-tour-delete-', '' );
 		deleteTours( deleteID );
 	});
-	
+
 	jQuery( '[ id^=ubcar-tour-edit- ]' ).click(function() {
 		editID = jQuery( this ).attr( 'id' ).replace( 'ubcar-tour-edit-', '' );
 		editTours( editID );
@@ -213,11 +251,11 @@ function displayTours( response ) {
 /**
  * AJAX call to class-ubcar-admin-tour.php's ubcar_tour_edit(), retrieving an
  * ubcar_tour post's data and formatting it for editing.
- * 
+ *
  * @param {Number} editID
  */
 function editTours( editID ) {
-	
+
 	var data, htmlString, htmlStringSelected, selectedLocations, htmlStringComplete;
 
 	var data = {
@@ -229,7 +267,7 @@ function editTours( editID ) {
 		if( response === false ) {
 			alert( 'Sorry, you do not have permission to edit that tour.' );
 		} else {
-		
+
 			if( Object.prototype.toString.call( response ) === '[object Object]' ) {
 				htmlString = '<td>';
 				htmlString += response.ID;
@@ -255,7 +293,7 @@ function editTours( editID ) {
 				htmlString += '<div class="button button-primary" id="ubcar-tour-close-edit-locations-';
 				htmlString += response.ID;
 				htmlString += '">Close</div>';
-				
+
 				htmlStringSelected = '<div class="ubcar-tour-locations">';
 				htmlStringSelected += '<h4>Selected Points</h4>';
 				htmlStringSelected += '<ul id="ubcar-tour-locations-selected-list-reorder-'
@@ -263,7 +301,7 @@ function editTours( editID ) {
 				htmlStringSelected += '" class="ubcar-tour-reorder-locations-'
 				htmlStringSelected += response.ID;
 				htmlStringSelected += '">';
-				
+
 				selectedLocations = [];
 				for( j in response.locations ) {
 					selectedLocations[ response.locations[ j ].ID ] = true;
@@ -293,7 +331,7 @@ function editTours( editID ) {
 
 				htmlString += htmlStringComplete;
 				htmlString += htmlStringSelected;
-				
+
 				htmlString += '</div></td>';
 				htmlString += '<td><div class="button button-primary" id="ubcar-tour-edit-submit-';
 				htmlString += response.ID;
@@ -321,13 +359,13 @@ function editTours( editID ) {
 /**
  * AJAX call to class-ubcar-admin-tour.php's ubcar_tour_edit_submit(),
  * submitting an ubcar_tour post's edited information and displaying it
- * 
+ *
  * @param {Number} thisthis The unique div of the post to be submitted
  */
 function editToursSubmit( thisthis ) {
-	
+
 	var editID, tourLocations, submitData, htmlString;
-	
+
 	editID = jQuery( thisthis ).attr( 'id' ).replace( 'ubcar-tour-edit-submit-', '' );
 	tourLocations = [];
 	jQuery( '#ubcar-tour-locations-selected-list-reorder-' + editID + ' li input' ).each(function() {
@@ -346,7 +384,7 @@ function editToursSubmit( thisthis ) {
 			alert( 'Sorry, you do not have permission to delete that tour.' );
 		} else {
 			if( Object.prototype.toString.call( response ) === '[object Object]' ) {
-				
+
 				htmlString = '<td>';
 				htmlString += response.ID;
 				htmlString += '</td><td>';
@@ -357,7 +395,7 @@ function editToursSubmit( thisthis ) {
 				htmlString += response.date;
 				htmlString += '</td><td>';
 				htmlString += response.description;
-				htmlString += '</td><td><div style="max-height: 200px; overflow: scroll">';
+				htmlString += '</td><td><div style="max-height: 200px; overflow: auto">';
 				htmlString += '<ol id="ubcar-tour-locations-display">';
 				for( j in response.locations ) {
 					htmlString += '<li>' + response.locations[ j ].title + ' ( #' + response.locations[ j ].ID + ' )</li>';

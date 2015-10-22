@@ -40,6 +40,7 @@
 			add_action( 'wp_ajax_tour_forward', array( $this, 'ubcar_tour_forward' ) );
 			add_action( 'wp_ajax_tour_backward', array( $this, 'ubcar_tour_backward' ) );
 			add_action( 'wp_ajax_tour_delete', array( $this, 'ubcar_tour_delete' ) );
+			add_action( 'wp_ajax_tour_goto', array( $this, 'ubcar_tour_goto' ) );
 			add_action( 'wp_ajax_tour_edit', array( $this, 'ubcar_tour_edit' ) );
 			add_action( 'wp_ajax_tour_edit_submit', array( $this, 'ubcar_tour_edit_submit' ) );
 		}
@@ -110,9 +111,13 @@
 			<div>
 				<table class="ubcar-table" id="ubcar-tour-table">
 				</table>
+				<div class="ubcar-goto">
+					<input type="text" id="ubcar-tour-choose-count" style="width:40px;">
+					<input type="submit" id="ubcar-tour-goto" value="Go to Page">
+				</div>
 				<div class="ubcar-forward-back">
 					<a class="ubcar-forward-back-control" id="ubcar-tour-back">Prev</a>
-					<span id="ubcar-tour-display-count">1</span>
+					<span id="ubcar-tour-display-count">1</span> of <span id="ubcar-tour-max-count"><?php echo max( ( ceil( wp_count_posts('ubcar_tour')->publish / 25 ) ), 1 ); ?></span>
 					<a class="ubcar-forward-back-control" id="ubcar-tour-forward">Next</a>
 				</div>
 			</div>
@@ -162,8 +167,13 @@
 		 */
 		function ubcar_tour_get_tours( $ubcar_tour_offset ) {
 			global $wpdb;
-			$ubcar_tours = get_posts( array( 'posts_per_page' => 10, 'offset' => $ubcar_tour_offset, 'order' => 'DESC', 'post_type' => 'ubcar_tour' ) );
+			$ubcar_get_tours_parameters = array( 'posts_per_page' => 25, 'offset' => $ubcar_tour_offset, 'order' => 'DESC', 'post_type' => 'ubcar_tour' );
 			$response = array();
+			if ( !current_user_can( 'edit_pages' ) ) {
+				$ubcar_current_user = wp_get_current_user();
+				$ubcar_get_tours_parameters['author_name'] = $ubcar_current_user->user_login;
+			}
+			$ubcar_tours = get_posts( $ubcar_get_tours_parameters );
 			foreach ( $ubcar_tours as $ubcar_tour ) {
 				$temp_array = $this->ubcar_get_tour( $ubcar_tour->ID );
 				array_push( $response, $temp_array );
@@ -226,7 +236,7 @@
 		 * @return void
 		 */
 		function ubcar_tour_forward() {
-			$this->ubcar_tour_get_tours( intval( $_POST['ubcar_tour_offset'] ) * 10 );
+			$this->ubcar_tour_get_tours( intval( $_POST['ubcar_tour_offset'] ) * 25 );
 		}
 
 		/**
@@ -238,12 +248,29 @@
 		 * @return void
 		 */
 		function ubcar_tour_backward() {
-			$back_tour = ( intval( $_POST['ubcar_tour_offset'] ) - 2 ) * 10;
+			$back_tour = ( intval( $_POST['ubcar_tour_offset'] ) - 2 ) * 25;
 			if( $back_tour < 0 ) {
 				$back_tour = 0;
 			}
 			$this->ubcar_tour_get_tours( $back_tour );
 		}
+
+		/**
+		 * This is the callback function for ubcar-tour-updater.js's
+		 * goto_tours() AJAX request, displaying the selected set of
+		 * ubcar_tour posts.
+		 *
+		 * @access public
+		 * @return void
+		 */
+		function ubcar_tour_goto() {
+			$goto_tour = ( intval( $_POST['ubcar_tour_offset'] ) - 1 ) * 25;
+			if( $goto_tour < 0 ) {
+				$goto_tour = 0;
+			}
+			$this->ubcar_tour_get_tours( $goto_tour );
+		}
+
 
 		/**
 		 * This is the callback function for ubcar-tour-updater.js's

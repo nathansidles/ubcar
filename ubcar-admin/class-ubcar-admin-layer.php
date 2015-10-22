@@ -43,6 +43,7 @@ class UBCAR_Admin_Layer extends UBCAR_Admin {
 			add_action( 'wp_ajax_layer_initial', array( $this, 'ubcar_layer_initial' ) );
 			add_action( 'wp_ajax_layer_forward', array( $this, 'ubcar_layer_forward' ) );
 			add_action( 'wp_ajax_layer_backward', array( $this, 'ubcar_layer_backward' ) );
+			add_action( 'wp_ajax_layer_goto', array( $this, 'ubcar_layer_goto' ) );
 			add_action( 'wp_ajax_layer_delete', array( $this, 'ubcar_layer_delete' ) );
 			add_action( 'wp_ajax_layer_edit', array( $this, 'ubcar_layer_edit' ) );
 			add_action( 'wp_ajax_layer_edit_submit', array( $this, 'ubcar_layer_edit_submit' ) );
@@ -96,9 +97,13 @@ class UBCAR_Admin_Layer extends UBCAR_Admin {
 			<h3>Manage Existing Layers</h3>
 			<table class="ubcar-table" id="ubcar-layer-table">
 			</table>
+			<div class="ubcar-goto">
+				<input type="text" id="ubcar-layer-choose-count" style="width:40px;">
+				<input type="submit" id="ubcar-layer-goto" value="Go to Page">
+			</div>
 			<div class="ubcar-forward-back">
 				<a class="ubcar-forward-back-control" id="ubcar-layer-back">Prev</a>
-				<span id="ubcar-layer-display-count">1</span>
+				<span id="ubcar-layer-display-count">1</span> of <span id="ubcar-layer-max-count"><?php echo max( ( ceil( wp_count_posts('ubcar_layer')->publish / 25 ) ), 1 ); ?></span>
 				<a class="ubcar-forward-back-control" id="ubcar-layer-forward">Next</a>
 			</div>
 			<?php
@@ -146,7 +151,7 @@ class UBCAR_Admin_Layer extends UBCAR_Admin {
 		 */
 		function ubcar_layer_get_layers( $ubcar_layer_offset ) {
 			global $wpdb;
-			$ubcar_layers = get_posts( array( 'posts_per_page' => 10, 'offset' => $ubcar_layer_offset, 'order' => 'DESC', 'post_type' => 'ubcar_layer' ) );
+			$ubcar_layers = get_posts( array( 'posts_per_page' => 25, 'offset' => $ubcar_layer_offset, 'order' => 'DESC', 'post_type' => 'ubcar_layer' ) );
 			$response = array();
 			foreach ( $ubcar_layers as $ubcar_layer ) {
 				$tempArray = $this->ubcar_get_layer( $ubcar_layer->ID );
@@ -198,7 +203,7 @@ class UBCAR_Admin_Layer extends UBCAR_Admin {
 		 * @return void
 		 */
 		function ubcar_layer_forward() {
-			$this->ubcar_layer_get_layers( intval( $_POST['ubcar_layer_offset'] ) * 10 );
+			$this->ubcar_layer_get_layers( intval( $_POST['ubcar_layer_offset'] ) * 25 );
 		}
 
 		/**
@@ -210,11 +215,27 @@ class UBCAR_Admin_Layer extends UBCAR_Admin {
 		 * @return void
 		 */
 		function ubcar_layer_backward() {
-			$back_layer = ( intval( $_POST['ubcar_layer_offset'] ) - 2 ) * 10;
+			$back_layer = ( intval( $_POST['ubcar_layer_offset'] ) - 2 ) * 25;
 			if( $back_layer < 0 ) {
 				$back_layer = 0;
 			}
 			$this->ubcar_layer_get_layers( $back_layer );
+		}
+
+		/**
+		 * This is the callback function for ubcar-layer-updater.js's
+		 * goto_layers() AJAX request, displaying the selected set of
+		 * ubcar_layer posts.
+		 *
+		 * @access public
+		 * @return void
+		 */
+		function ubcar_layer_goto() {
+			$goto_layer = ( intval( $_POST['ubcar_layer_offset'] ) - 1 ) * 25;
+			if( $goto_layer < 0 ) {
+				$goto_layer = 0;
+			}
+			$this->ubcar_layer_get_layers( $goto_layer );
 		}
 
 		/**

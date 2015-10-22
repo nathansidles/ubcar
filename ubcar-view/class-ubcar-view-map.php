@@ -180,14 +180,21 @@
 						<div class="ubcar-header" id="ubcar-header-aggregate">Layer/Tour<br />Information</div>
 						<div class="ubcar-body" id="ubcar-body-aggregate"></div>
 					</div>
-					<div id="ubcar-point-information">
-						<div class="ubcar-header" id="ubcar-header-information">Point<br />Information</div>
-						<div class="ubcar-body" id="ubcar-body-information"></div>
-					</div>
-					<div id="ubcar-point-media">
-						<div class="ubcar-header" id="ubcar-header-media">Point<br />Media</div>
-						<div class="ubcar-body" id="ubcar-body-media"></div>
-					</div>
+					<?php if( get_option( 'ubcar_display_choice' ) == 'separate' ) { ?>
+						<div id="ubcar-point-information">
+							<div class="ubcar-header" id="ubcar-header-information">Point<br />Information</div>
+							<div class="ubcar-body" id="ubcar-body-information"></div>
+						</div>
+						<div id="ubcar-point-media">
+							<div class="ubcar-header" id="ubcar-header-media">Point<br />Media</div>
+							<div class="ubcar-body" id="ubcar-body-media"></div>
+						</div>
+					<?php } else { ?>
+						<div id="ubcar-point-information">
+							<div class="ubcar-header" id="ubcar-header-information">Point<br />Content</div>
+							<div class="ubcar-body" id="ubcar-body-information"></div>
+						</div>
+					<?php } ?>
 					<div class="ubcar-header" id="ubcar-header-comments">Point<br />Comments</div>
 					<div class="ubcar-body" id="ubcar-body-comments"></div>
 					<div class="ubcar-header" id="ubcar-header-comments-submit">Submit New Comment</div>
@@ -627,6 +634,7 @@
                   <td>
                     <select id="ubcar-video-type" name="ubcar-video-type" class="">
                       <option value="youtube">YouTube</option>
+											<option value="vimeo">Vimeo</option>
                     </select>
                   </td>
                 </tr>
@@ -726,6 +734,9 @@
 				$tempArray["full_size_url"] = wp_get_attachment_url( $ubcar_media_meta['url'] );
 			} else {
 				$tempArray["url"] = $ubcar_media_meta['url'];
+			}
+			if( $ubcar_media_meta['type'] == 'video' ) {
+				$tempArray["video_type"] = $ubcar_media_meta['video_type'];
 			}
 			$tempArray["uploader"] = $ubcar_media_author->first_name . ' ' . $ubcar_media_author->last_name . ' (' . $ubcar_media_author->user_login . ')';
 			$tempArray["title"] = $ubcar_media->post_title;

@@ -184,6 +184,7 @@
                   <td>
                     <select id="ubcar-video-type" name="ubcar-video-type" class="">
                       <option value="youtube">YouTube</option>
+                      <option value="vimeo">Vimeo</option>
                     </select>
                   </td>
                 </tr>
@@ -745,6 +746,9 @@
 				$tempArray["full_size_url"] = wp_get_attachment_url( $ubcar_media_meta['url'] );
 			} else {
 				$tempArray["url"] = $ubcar_media_meta['url'];
+			}
+      if( $ubcar_media_meta['type'] == 'video' ) {
+				$tempArray["video_type"] = $ubcar_media_meta['video_type'];
 			}
 			$tempArray["uploader"] = $ubcar_media_author->first_name . ' ' . $ubcar_media_author->last_name . ' (' . $ubcar_media_author->user_login . ')';
 			$tempArray["title"] = $ubcar_media->post_title;

@@ -1,7 +1,7 @@
 jQuery( document ).ready(function( $ ) {
-	
+
 	var requestedLatlng, mapOptions, map, marker, data;
-	
+
 	requestedLatlng = new google.maps.LatLng( 49.2683366, -123.2550359 );
 	mapOptions = {
 		zoom: 10,
@@ -11,51 +11,55 @@ jQuery( document ).ready(function( $ ) {
 	map = new google.maps.Map( document.getElementById( 'ubcar-map-canvas' ), mapOptions );
 	marker = new google.maps.Marker( {
 	});
-	
+
    data = {
 		'action' : 'point_initial'
 	};
 	jQuery.post( ajax_object.ajax_url, data, function( response ) {
 		displayPoints( response );
-		if( response.length < 10 ) {
+		if( response.length < 25 ) {
 			jQuery( '#ubcar-point-forward' ).hide();
 		}
 		jQuery( '#ubcar-point-back' ).hide();
 	});
-	
+
 	// ubcar point updater
 	jQuery( '#ubcar-point-submit' ).click(function() {
 		updatePoints();
 	});
-	
+
 	// ubcar point forward
 	jQuery( '#ubcar-point-forward' ).click(function() {
 		forwardPoints();
 	});
-	
+
 	// ubcar point backward
 	jQuery( '#ubcar-point-back' ).click(function() {
 		backwardPoints();
 	});
-	
+
 	jQuery( '[ id^=ubcar-point-delete- ]' ).click(function() {
 		deletePoints();
 	});
-	
+
+	jQuery( '#ubcar-point-goto' ).click(function() {
+		goToPoints();
+	});
+
 	google.maps.event.addListener( map, 'click', function( event ) {
 		jQuery( '#ubcar-point-longitude' ).val( event.latLng.lng() );
 		jQuery( '#ubcar-point-latitude' ).val( event.latLng.lat() );
 		marker.setPosition( event.latLng );
 		marker.setMap( map );
 	});
-	
+
 	jQuery( '#ubcar-point-latlng-check' ).click(function() {
 		requestedLatlng = new google.maps.LatLng( escapeHTML( jQuery( '#ubcar-point-latitude' ).val() ), escapeHTML( jQuery( '#ubcar-point-longitude' ).val() ) );
 		map.setCenter( requestedLatlng );
 		marker.setPosition( requestedLatlng );
 		marker.setMap( map );
 	});
-	
+
 });
 
 /**
@@ -81,7 +85,7 @@ function updatePoints() {
 			displayPoints( response );
 			jQuery( '#ubcar-point-display-count' ).html( 1 );
 			jQuery( '#ubcar-point-back' ).hide();
-			if( response.length < 10 ) {
+			if( response.length < 25 ) {
 				jQuery( '#ubcar-point-forward' ).hide();
 			} else {
 				jQuery( '#ubcar-point-forward' ).show();
@@ -95,9 +99,9 @@ function updatePoints() {
  * incrementing the displayed ubcar_point posts
  */
 function forwardPoints() {
-	
+
 	var data, currentPage;
-	
+
 	data = {
 		'action' : 'point_forward',
 		'ubcar_point_offset' : escapeHTML( jQuery( '#ubcar-point-display-count' ).html() )
@@ -106,7 +110,7 @@ function forwardPoints() {
 		displayPoints( response );
 		currentPage = parseInt( jQuery( '#ubcar-point-display-count' ).html() );
 		jQuery( '#ubcar-point-display-count' ).html( currentPage + 1 );
-		if( response.length < 10 ) {
+		if( response.length < 25 ) {
 			jQuery( '#ubcar-point-forward' ).hide();
 		} else {
 			jQuery( '#ubcar-point-forward' ).show();
@@ -120,9 +124,9 @@ function forwardPoints() {
  * decrementing the displayed ubcar_point posts
  */
 function backwardPoints() {
-	
+
 	var data, currentPage;
-	
+
 	data = {
 		'action' : 'point_backward',
 		'ubcar_point_offset' : escapeHTML( jQuery( '#ubcar-point-display-count' ).html() )
@@ -139,9 +143,43 @@ function backwardPoints() {
 }
 
 /**
+ * AJAX call to class-ubcar-admin-point.php's ubcar_point_goto(),
+ * going to the designated point page
+ */
+function goToPoints() {
+	var data, currentPage, desiredPage, maxPage;
+	desiredPage = parseInt( jQuery( '#ubcar-point-choose-count' ).val() );
+	maxPage = parseInt( jQuery( '#ubcar-point-max-count' ).html() )
+	if( desiredPage > maxPage ) {
+		desiredPage = maxPage;
+	} else if( desiredPage < 1 ) {
+		desiredPage = 1;
+	}
+	data = {
+		'action' : 'point_goto',
+		'ubcar_point_offset' : desiredPage
+	};
+	jQuery.post( ajax_object.ajax_url, data, function( response ) {
+		displayPoints( response );
+		currentPage = desiredPage;
+		jQuery( '#ubcar-point-choose-count' ).val( currentPage );
+		jQuery( '#ubcar-point-display-count' ).html( currentPage );
+		if( currentPage === 1 ) {
+			jQuery( '#ubcar-point-back' ).hide();
+		}
+		if( response.length < 25 ) {
+			jQuery( '#ubcar-point-forward' ).hide();
+		} else {
+			jQuery( '#ubcar-point-forward' ).show();
+		}
+	});
+	jQuery( '#ubcar-point-forward' ).show();
+}
+
+/**
  * AJAX call to class-ubcar-admin-point.php's ubcar_point_delete(), deleting the
  * selected ubcar_point post.
- * 
+ *
  * @param {Number} deleteID
  */
 function deletePoints( deleteID ) {
@@ -158,7 +196,7 @@ function deletePoints( deleteID ) {
 				displayPoints( response );
 				jQuery( '#ubcar-point-display-count' ).html( 1 );
 				jQuery( '#ubcar-point-back' ).hide();
-				if( response.length < 10 ) {
+				if( response.length < 25 ) {
 					jQuery( '#ubcar-point-forward' ).hide();
 				} else {
 					jQuery( '#ubcar-point-forward' ).show();
@@ -170,15 +208,15 @@ function deletePoints( deleteID ) {
 
 /**
  * Helper function to display retrieved ubcar_point posts data.
- * 
+ *
  * @param {Object[]} response JSON object of ubcar_point posts' data
  */
 function displayPoints( response ) {
-	
+
 	if( Object.prototype.toString.call( response ) === '[object Array]' ) {
-	
+
 		var htmlString, deleteID, editID;
-		
+
 		htmlString = '<tr><td>ID</td><td>Title</td><td>Uploader</td><td>Date Uploaded</td><td>Description</td><td>Latitude</td><td>Longitude</td><td>Tags</td><td>Action</td></tr>';
 		for( i in response ) {
 			htmlString += '<tr id="ubcar-point-line-';
@@ -212,12 +250,12 @@ function displayPoints( response ) {
 	} else {
 		alert( 'An UBCAR error has occurred! Please log out and log back in again.' );
 	}
-	
+
 	jQuery( '[ id^=ubcar-point-delete- ]' ).click(function() {
 		deleteID = jQuery( this ).attr( 'id' ).replace( 'ubcar-point-delete-', '' );
 		deletePoints( deleteID );
 	});
-	
+
 	jQuery( '[ id^=ubcar-point-edit- ]' ).click(function() {
 		editID = jQuery( this ).attr( 'id' ).replace( 'ubcar-point-edit-', '' );
 		editPoints( editID );
@@ -227,7 +265,7 @@ function displayPoints( response ) {
 /**
  * AJAX call to class-ubcar-admin-point.php's ubcar_point_edit(), retrieving an
  * ubcar_point post's data and formatting it for editing.
- * 
+ *
  * @param {Number} editID
  */
 function editPoints( editID ) {
@@ -244,7 +282,7 @@ function editPoints( editID ) {
 			alert( 'Sorry, you do not have pssermission to edit that point.' );
 		} else {
 			if( Object.prototype.toString.call( response ) === '[object Object]' ) {
-			
+
 				htmlString = '<td>';
 				htmlString += response.ID;
 				htmlString += '</td><td><input type="text" id="ubcar-point-edit-title-';
@@ -286,13 +324,13 @@ function editPoints( editID ) {
 /**
  * AJAX call to class-ubcar-admin-point.php's ubcar_point_edit_submit(),
  * submitting an ubcar_point post's edited information and displaying it
- * 
+ *
  * @param {Number} thisthis The unique div of the post to be submitted
  */
 function editPointsSubmit( thisthis ) {
-	
+
 	var editID, submitData, htmlString;
-	
+
 	editID = jQuery( thisthis ).attr( 'id' ).replace( 'ubcar-point-edit-submit-', '' );
 	submitData = {
 		'action' : 'point_edit_submit',
@@ -309,7 +347,7 @@ function editPointsSubmit( thisthis ) {
 			alert( 'Sorry, you do not have permission to delete that point.' );
 		} else {
 			if( Object.prototype.toString.call( response ) === '[object Object]' ) {
-			
+
 			htmlString = '<td>';
 			htmlString += response.ID;
 			htmlString += '</td><td>';

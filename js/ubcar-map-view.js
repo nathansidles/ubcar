@@ -63,6 +63,12 @@ jQuery( document ).ready(function() {
 		jQuery( window ).scrollTop( jQuery( '.ubcar-content' ).offset().top - 40 );
 	});
 
+	// Test to see if the one-pane, unified data display option is selected in full-width display mode
+	if( jQuery( '#ubcar-point-media' ).html() === undefined &&  jQuery( '#ubcar-header-aggregate' ).css( 'bottom' ) !== 'auto' ) {
+		jQuery( '#ubcar-header-aggregate' ).css( 'bottom', '270px' );
+		jQuery( '#ubcar-header-information' ).css( 'bottom', '225px' );
+	}
+
 	ubcarMap.requestDetector();
 
 });
@@ -456,7 +462,12 @@ function UBCARMap( map ) {
 					htmlStringMedia += response.ubcar_media[ i ].image;
 					htmlStringMedia += '</a>';
 				} else if( response.ubcar_media[ i ].type === 'video' ) {
-					htmlStringMedia += '<iframe width="100%" height="300" src="//www.youtube.com/embed/' + response.ubcar_media[ i ].url + '" frameborder="0" allowfullscreen></iframe>';
+					alert( response.ubcar_media[ i ].video_type );
+					if( response.ubcar_media[ i ].video_type === 'youtube' ) {
+						htmlStringMedia += '<iframe width="100%" height="300" src="//www.youtube.com/embed/' + response.ubcar_media[ i ].url + '" frameborder="0" allowfullscreen></iframe>';
+					} else if( response.ubcar_media[ i ].video_type === 'vimeo' ) {
+						htmlStringMedia += '<iframe src="https://player.vimeo.com/video/' + response.ubcar_media[ i ].url  + '" width="100%" height="300" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
+					}
 				} else if( response.ubcar_media[ i ].type === 'audio' ) {
 					htmlStringMedia += '<iframe width="100%" height="150" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/' + response.ubcar_media[ i ].url + '&amp;auto_play=false&amp;hide_related=true&amp;show_comments=false&amp;show_user=true&amp;show_reposts=false&amp;visual=false"></iframe>';
 				}
@@ -491,6 +502,14 @@ function UBCARMap( map ) {
 
 		jQuery( '#ubcar-body-information' ).html( htmlStringDescription );
 		jQuery( '#ubcar-body-media' ).html( htmlStringMedia );
+
+		// Test to see if the one-pane, unified data display option is selected in full-width display mode
+		if( jQuery( '#ubcar-point-media' ).html() === undefined &&  jQuery( '#ubcar-header-aggregate' ).css( 'bottom' ) !== 'auto' ) {
+			jQuery( '#ubcar-body-information' ).append( "<br /><hr /><br />" );
+			jQuery( '#ubcar-body-information' ).append( htmlStringMedia );
+		} else {
+			jQuery( '#ubcar-body-media' ).html( htmlStringMedia );
+		}
 
 		jQuery( '.ubcar-wiki-header' ).click(function() {
 			wikiID = jQuery( this ).attr( 'id' ).replace( 'ubcar-wiki-header-', '' );
