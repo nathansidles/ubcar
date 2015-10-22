@@ -427,9 +427,12 @@
 				$tempArray["url"] = $ubcar_media_meta['url'];
 				$tempArray["type"] = $ubcar_media_meta['type'];
 			}
+<<<<<<< HEAD
 			if( $ubcar_media_meta['type'] == 'video' ) {
 				$tempArray["video_type"] = $ubcar_media_meta['video_type'];
 			}
+=======
+>>>>>>> 9124867281b51f5c15215970d10c23191a2fbe45
 			$tempArray["uploader"] = $ubcar_media_author->first_name . ' ' . $ubcar_media_author->last_name . ' (' . $ubcar_media_author->user_login . ')';
 			$tempArray["title"] = $ubcar_media->post_title;
 			$tempArray["date"] = get_the_date( 'Y-m-d', $ubcar_media->ID );
