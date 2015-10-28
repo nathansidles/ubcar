@@ -1,18 +1,18 @@
 <?php
 	/**
 	 * The UBCAR_DATA_GeoJSON subclass
-	 * 
+	 *
 	 * This file defines the UBCAR_DATA_GeoJSON subclass. The UBCAR_DATA_GeoJSON
 	 * class produces GeoJSON-formatted ubcar_point data upon GET request. It
 	 * accepts the following fields:
-	 * 
+	 *
 	 * - ubcar_layers[]: ubcar_layer IDs
 	 * - ubcar_tours[]:  ubcar_tour IDs
 	 * - ubcar_search[]: text strings to be searched
-	 * 
+	 *
 	 * If no valid field is selected, all points are returned. The ubcar_search
 	 * field retrieves data with a custom SQL query.
-	 * 
+	 *
 	 * @package UBCAR
 	 */
 
@@ -20,20 +20,20 @@
 	 * The UBCAR_DATA_GeoJSON subclass
 	 */
 	class UBCAR_Data_GeoJSON extends UBCAR_Data {
-	
+
 		/**
 		 * The UBCAR_DATA_GeoJSON constructor.
-		 * 
+		 *
 		 * @access public
 		 * @return void
 		 */
 		public function __construct() {
 			$this->add_actions();
 		}
-		
+
 		/**
 		 * This function adds the UBCAR_DATA_GeoJSON actions and filters.
-		 * 
+		 *
 		 * @access public
 		 * @return void
 		 */
@@ -41,13 +41,13 @@
 			add_filter( 'query_vars', array( $this, 'query_vars' ) );
 			add_action( 'parse_request', array( $this, 'parse_request' ) );
 		}
-		
+
 		/**
 		 * This function adds the desired UBCAR query variable to the query_vars
 		 * array
-		 * 
+		 *
 		 * @param array $query_vars
-		 * 
+		 *
 		 * @access public
 		 * @return array
 		 */
@@ -59,9 +59,9 @@
 		/**
 		 * This function sets the behavior to be performed if the UBCAR query
 		 * variable is set in a request.
-		 * 
+		 *
 		 * @param object $wp
-		 * 
+		 *
 		 * @access public
 		 * @return void
 		 */
@@ -74,7 +74,7 @@
 
 		/**
 		 * This function assembles and echoes the GeoJSON file.
-		 * 
+		 *
 		 * @access public
 		 * @return void
 		 */
@@ -83,11 +83,11 @@
 			$this->ubcar_download_geojson_body();
 			exit;
 		}
-		
+
 		/**
 		 * This is the helper function for assembling a GeoJSON file's headers,
 		 * assigning a random suffix to the filename to preclude Google caching.
-		 * 
+		 *
 		 * @access public
 		 * @return void
 		 */
@@ -101,10 +101,10 @@
 			header( $randomized_name );
 			header( "Content-Transfer-Encoding: binary" );
 		}
-		
+
 		/**
 		 * This is the helper function for assembling a GeoJSON file's body.
-		 * 
+		 *
 		 * @access public
 		 * @return void
 		 */
@@ -124,7 +124,7 @@
 		/**
 		 * This is the helper function for assembling the GeoJSON file's individual
 		 * points.
-		 * 
+		 *
 		 * @access public
 		 * @return void
 		 */
@@ -153,7 +153,7 @@
 		/**
 		 * This is the helper function for retrieving ubcar_point data for the
 		 * GeoJSON file, including a custom SQL query for tag searching.
-		 * 
+		 *
 		 * @access public
 		 * @return array
 		 */
@@ -195,7 +195,7 @@
 			} else if( isset( $_GET['ubcar_search'] ) ) {
 				global $wpdb;
 				$ubcar_meta_field = 'ubcar_point_tags';
-				$ubcar_search_results = $wpdb->get_results( $wpdb->prepare( 
+				$ubcar_search_results = $wpdb->get_results( $wpdb->prepare(
 					"SELECT post_id FROM $wpdb->postmeta
 					WHERE meta_key = '%s'
 					AND meta_value LIKE '%%%s%%'",
@@ -230,5 +230,5 @@
 		}
 
 	}
-	
+
 ?>

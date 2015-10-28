@@ -123,42 +123,71 @@
 			</noscript>
 			<div class="ubcar-content">
 				<div class="ubcar-informational-left-column">
-					<div class="ubcar-aggregate-container">
-						<div class="ubcar-header" id="ubcar-show-all">Show All</div>
-						<div class="ubcar-accordion-header" id="ubcar-accordion-header-layers">Layers</div>
-						<div class="ubcar-accordion-body" id="ubcar-accordion-body-layers">
-							<form method="POST" action="" style="width: 100%;" id="ubcar-layers-form">
-							<table>
+					<?php if( ( get_option( 'ubcar_control_display_choice' ) == 0 ) || !( ( isset( $_GET['layer'] ) && is_numeric( $_GET['layer'] ) ) || ( isset( $_GET['tour'] ) && is_numeric( $_GET['tour'] ) ) ) ) { ?>
+						<div class="ubcar-aggregate-container">
+							<div class="ubcar-header" id="ubcar-show-all">Show All</div>
+							<div class="ubcar-accordion-header" id="ubcar-accordion-header-layers">Layers</div>
+							<div class="ubcar-accordion-body" id="ubcar-accordion-body-layers">
+								<form method="POST" action="" style="width: 100%;" id="ubcar-layers-form">
+								<table>
+									<?php
+										foreach( $ubcar_layers as $ubcar_layer ) {
+											?>
+												<tr>
+												<td><input type="checkbox" id="<?php echo $ubcar_layer->ID ?>" /> <?php echo $ubcar_layer->post_title ?> (#<?php echo $ubcar_layer->ID ?>)<br /></td>
+												</tr>
+											<?php
+										}
+									?>
+								</table>
+								</form>
+							</div>
+							<div class="ubcar-accordion-header" id="ubcar-accordion-header-tours">Tours</div>
+							<div class="ubcar-buffer"></div>
+							<div class="ubcar-accordion-body" id="ubcar-accordion-body-tours">
+								<form method="POST" action="" style="width: 100%;" id="ubcar-tours-form">
+								<table>
 								<?php
-									foreach( $ubcar_layers as $ubcar_layer ) {
+									foreach( $ubcar_tours as $ubcar_tour ) {
 										?>
 											<tr>
-											<td><input type="checkbox" id="<?php echo $ubcar_layer->ID ?>" /> <?php echo $ubcar_layer->post_title ?> (#<?php echo $ubcar_layer->ID ?>)<br /></td>
+												<td><input type="checkbox" id="<?php echo $ubcar_tour->ID ?>" /> <?php echo $ubcar_tour->post_title ?> (#<?php echo $ubcar_tour->ID ?>)<br /></td>
 											</tr>
 										<?php
 									}
 								?>
-							</table>
-							</form>
+								</table>
+								</form>
+							</div>
 						</div>
-						<div class="ubcar-accordion-header" id="ubcar-accordion-header-tours">Tours</div>
-						<div class="ubcar-buffer"></div>
-						<div class="ubcar-accordion-body" id="ubcar-accordion-body-tours">
-							<form method="POST" action="" style="width: 100%;" id="ubcar-tours-form">
-							<table>
+					<?php } else { ?>
+						<form method="POST" action="" style="width: 100%; height: 0;" id="ubcar-tours-form">
+						<table>
+						<?php
+							foreach( $ubcar_tours as $ubcar_tour ) {
+								?>
+									<tr>
+										<td><input type="checkbox" id="<?php echo $ubcar_tour->ID ?>" /> <?php echo $ubcar_tour->post_title ?> (#<?php echo $ubcar_tour->ID ?>)<br /></td>
+									</tr>
+								<?php
+							}
+						?>
+						</table>
+						</form>
+						<form method="POST" action="" style="width: 100%; height: 0;" id="ubcar-layers-form">
+						<table>
 							<?php
-								foreach( $ubcar_tours as $ubcar_tour ) {
+								foreach( $ubcar_layers as $ubcar_layer ) {
 									?>
 										<tr>
-											<td><input type="checkbox" id="<?php echo $ubcar_tour->ID ?>" /> <?php echo $ubcar_tour->post_title ?> (#<?php echo $ubcar_tour->ID ?>)<br /></td>
+										<td><input type="checkbox" id="<?php echo $ubcar_layer->ID ?>" /> <?php echo $ubcar_layer->post_title ?> (#<?php echo $ubcar_layer->ID ?>)<br /></td>
 										</tr>
 									<?php
 								}
 							?>
-							</table>
-							</form>
-						</div>
-					</div>
+						</table>
+						</form>
+					<?php } ?>
 					<div id="ubcar-map-canvas">
 					</div>
 					<div id="ubcar-streetview-canvas">
@@ -170,10 +199,12 @@
 						<div class="ubcar-half-buffer"></div>
 						<div class="ubcar-accordion-header ubcar-half" id="ubcar-display-fullscreen">Fullscreen</div>
 					</div>
-					<div class="ubcar-header" id="ubcar-title-search">
-						<input id="ubcar-search-input">
-						<div class="ubcar-button" id="ubcar-search-button">Search</div>
-					</div>
+					<?php if( ( get_option( 'ubcar_control_display_choice' ) == 0 ) || !( ( isset( $_GET['layer'] ) && is_numeric( $_GET['layer'] ) ) || ( isset( $_GET['tour'] ) && is_numeric( $_GET['tour'] ) ) ) ) { ?>
+						<div class="ubcar-header" id="ubcar-title-search">
+							<input id="ubcar-search-input">
+							<div class="ubcar-button" id="ubcar-search-button">Search</div>
+						</div>
+					<?php } ?>
 				</div>
 				<div class="ubcar-informational-right-column">
 					<div id="ubcar-tour-information">
@@ -687,7 +718,17 @@
                 </tr>
                 <tr>
                   <th scope="row">
-                    <?php echo '<input type="hidden" value="' . $_POST['ubcar_point_id'] . '" id="ubcar-hidden-request-location" name="ubcar-hidden-request-location">'; ?>
+                    <?php
+											if( ( get_option( 'ubcar_control_display_choice' ) == 1 ) && ( ( isset( $_GET['layer'] ) && is_numeric( $_GET['layer'] ) ) || ( isset( $_GET['tour'] ) && is_numeric( $_GET['tour'] ) ) ) ) {
+												if( isset( $_GET['layer'] ) && is_numeric( $_GET['layer'] ) ) {
+														echo '<input type="hidden" value="' . $_GET['layer'] . '" id="ubcar-hidden-request-location" name="ubcar-hidden-request-location">';
+												} else if( isset( $_GET['tour'] ) && is_numeric( $_GET['tour'] ) ) {
+														echo '<input type="hidden" value="' . $_GET['tour'] . '" id="ubcar-hidden-request-location" name="ubcar-hidden-request-location">';
+												}
+											} else {
+												echo '<input type="hidden" value="' . $_POST['ubcar_point_id'] . '" id="ubcar-hidden-request-location" name="ubcar-hidden-request-location">';
+											}
+										?>
                     <input class="button button-primary" name="ubcar-media-submit" id="ubcar-media-submit" type="submit" value="Upload">
                   </th>
                 </tr>
@@ -843,7 +884,16 @@
 
 					}
 					$return_pathway = explode( '?' , $_SERVER['REQUEST_URI'] );
-					$return_url = plugins_url( 'ubcar-data/ubcar-post-redirect-get.php', dirname( __FILE__ ) ) . '?return=' . 'http'.(empty($_SERVER['HTTPS'])?'':'s').'://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'] . '&map_point=' . $_POST['ubcar-hidden-request-location'];
+					$return_url = plugins_url( 'ubcar-data/ubcar-post-redirect-get.php', dirname( __FILE__ ) ) . '?return=' . 'http'.(empty($_SERVER['HTTPS'])?'':'s').'://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'];
+					if( ( get_option( 'ubcar_control_display_choice' ) == 1 ) && ( ( isset( $_GET['layer'] ) && is_numeric( $_GET['layer'] ) ) || ( isset( $_GET['tour'] ) && is_numeric( $_GET['tour'] ) ) ) ) {
+						if( isset( $_GET['layer'] ) && is_numeric( $_GET['layer'] ) ) {
+							$return_url .= '&map_layer=' . $_GET['layer'];
+						} else if( isset( $_GET['tour'] ) && is_numeric( $_GET['tour'] ) ) {
+							$return_url .= '&map_tour=' . $_GET['tour'];
+						}
+					} else {
+						$return_url .= '&map_point=' . $_POST['ubcar-hidden-request-location'];
+					}
 					wp_redirect( $return_url );
 					exit;
 				}

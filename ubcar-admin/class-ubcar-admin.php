@@ -221,6 +221,23 @@
 							?>
 						</td>
 					</tr>
+					<tr>
+						<th scope="row"><label for="ubcar_control_display_choice">Tour/Layer Selection for Tours and Layers View</label></th>
+						<td>
+							<?php
+								echo '<input name="ubcar-control-display-choice" type="radio" id="ubcar-control-display-choice-1" ';
+								if( get_option( 'ubcar_control_display_choice' ) == '0' || get_option( 'ubcar_control_display_choice' ) == '' ) {
+									echo 'checked ';
+								}
+								echo '/> Visible<br />';
+								echo '<input name="ubcar-control-display-choice" type="radio" id="ubcar-control-display-choice-2" ';
+								if( get_option( 'ubcar_control_display_choice' ) == '1' ) {
+									echo 'checked ';
+								}
+								echo '/> Invisible';
+							?>
+						</td>
+					</tr>
 				</table>
 				<div class="button button-primary" id="ubcar-options-submit">Submit</div>
 			<?php
@@ -239,6 +256,7 @@
 				update_option( 'ubcar_display_choice', esc_attr( $_POST['ubcar_display_choice'] ) );
 				update_option( 'ubcar_point_choice', esc_attr( $_POST['ubcar_point_choice'] ) );
 				update_option( 'ubcar_tour_choice', esc_attr( $_POST['ubcar_tour_choice'] ) );
+				update_option( 'ubcar_control_display_choice', esc_attr( $_POST['ubcar_control_display_choice'] ) );
 				update_option( 'ubcar_google_maps_api_key', esc_attr( $_POST['ubcar_google_maps_api_key'] ) );
 				echo 'UBCAR options updated!';
 			} else {

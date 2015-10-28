@@ -462,7 +462,6 @@ function UBCARMap( map ) {
 					htmlStringMedia += response.ubcar_media[ i ].image;
 					htmlStringMedia += '</a>';
 				} else if( response.ubcar_media[ i ].type === 'video' ) {
-					alert( response.ubcar_media[ i ].video_type );
 					if( response.ubcar_media[ i ].video_type === 'youtube' ) {
 						htmlStringMedia += '<iframe width="100%" height="300" src="//www.youtube.com/embed/' + response.ubcar_media[ i ].url + '" frameborder="0" allowfullscreen></iframe>';
 					} else if( response.ubcar_media[ i ].video_type === 'vimeo' ) {
