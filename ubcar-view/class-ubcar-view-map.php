@@ -161,7 +161,7 @@
 							</div>
 						</div>
 					<?php } else { ?>
-						<form method="POST" action="" style="width: 100%; height: 0;" id="ubcar-tours-form">
+						<form method="POST" action="" style="width: 100%; height: 0; display: none !important;" id="ubcar-tours-form">
 						<table>
 						<?php
 							foreach( $ubcar_tours as $ubcar_tour ) {
@@ -174,7 +174,7 @@
 						?>
 						</table>
 						</form>
-						<form method="POST" action="" style="width: 100%; height: 0;" id="ubcar-layers-form">
+						<form method="POST" action="" style="width: 100%; height: 0; display: none !important;" id="ubcar-layers-form">
 						<table>
 							<?php
 								foreach( $ubcar_layers as $ubcar_layer ) {
